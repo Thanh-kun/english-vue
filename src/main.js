@@ -1,4 +1,8 @@
-import './assets/main.css'
+// Supports weights 200-900
+import '@fontsource-variable/nunito';
+// CSS
+import 'ant-design-vue/dist/reset.css'
+import '@/assets/css/index.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
