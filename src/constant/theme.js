@@ -2,7 +2,10 @@ import colors from 'tailwindcss/colors'
 import { fontFamily } from 'tailwindcss/defaultTheme'
 
 export const themeColors = {
-  primary: colors.blue
+  primary: colors.blue,
+  gray: colors.gray,
+  white: colors.white,
+  black: colors.black
 }
 export const themeFontFamily = {
   primary: ['Nunito Variable', ...fontFamily.sans]
