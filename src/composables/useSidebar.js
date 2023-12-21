@@ -1,15 +1,22 @@
-import { h, computed } from 'vue'
+import { h, computed, ref } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import {
   UserOutlined,
   ContainerOutlined,
   FileTextOutlined,
-  QuestionCircleOutlined
+  QuestionCircleOutlined,
+  AppstoreOutlined,
+  LoginOutlined
 } from '@ant-design/icons-vue'
 
 export default function useSidebar() {
   const route = useRoute()
   const menuItems = [
+    {
+      label: h(RouterLink, { to: '/admin' }, { default: () => 'Dashboard' }),
+      key: '/admin',
+      icon: h(AppstoreOutlined)
+    },
     {
       label: h(RouterLink, { to: '/admin/user' }, { default: () => 'User' }),
       key: '/admin/user',
@@ -29,15 +36,23 @@ export default function useSidebar() {
       label: h(RouterLink, { to: '/admin/question' }, { default: () => 'Question' }),
       key: '/admin/question',
       icon: h(QuestionCircleOutlined)
+    },
+    {
+      label: 'Log out',
+      key: 'logout',
+      icon: h(LoginOutlined)
     }
   ]
 
   const selectedKeys = computed(() => {
-    return menuItems.filter((item) => route.path.startsWith(item.key)).map((item) => item.key)
+    return menuItems.filter((item) => route.path === item.key).map((item) => item.key)
   })
+
+  const collapsed = ref(false)
 
   return {
     selectedKeys,
-    menuItems
+    menuItems,
+    collapsed
   }
 }

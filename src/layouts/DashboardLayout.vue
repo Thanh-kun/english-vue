@@ -1,18 +1,24 @@
 <script setup>
 import { Layout, LayoutSider, LayoutContent, Menu } from 'ant-design-vue'
 import { useSidebar } from '@/composables'
-// import LogoFrame from '@/components/Logo/LogoFrame.vue'
 import LogoText from '@/components/Logo/LogoText.vue'
+import { LeftOutlined, RightOutlined } from '@ant-design/icons-vue'
 
-const { menuItems, selectedKeys } = useSidebar()
+const { menuItems, selectedKeys, collapsed } = useSidebar()
 </script>
 <template>
   <div>
     <Layout style="min-height: 100vh">
-      <LayoutSider width="256" theme="light" class="border-r">
+      <LayoutSider
+        v-model:collapsed="collapsed"
+        collapsible
+        width="256"
+        theme="light"
+        class="border-r"
+      >
         <div class="pt-8 pb-10 px-2">
-          <div class="h-14 w-full rounded-md overflow-hidden">
-            <LogoText class="w-full" style="color: #003366;"/>
+          <div class="h-12 w-full rounded-md overflow-hidden">
+            <LogoText class="w-full" style="color: #003366" />
           </div>
         </div>
         <Menu
@@ -21,6 +27,12 @@ const { menuItems, selectedKeys } = useSidebar()
           mode="inline"
           class="!border-r-0"
         ></Menu>
+        <template #trigger>
+          <div class="bg-gray-50 border-r">
+            <RightOutlined v-show="collapsed" />
+            <LeftOutlined v-show="!collapsed" />
+          </div>
+        </template>
       </LayoutSider>
       <LayoutContent>
         <div class="min-h-screen bg-primary-50 bg-opacity-80 px-4 py-2">
