@@ -4,17 +4,18 @@ import { useSidebar } from '@/composables'
 import LogoText from '@/components/Logo/LogoText.vue'
 import { LeftOutlined, RightOutlined } from '@ant-design/icons-vue'
 
-const { menuItems, selectedKeys, collapsed } = useSidebar()
+const { menuItems, selectedKeys, collapsed, toggleMenu } = useSidebar()
 </script>
 <template>
   <div>
     <Layout style="min-height: 100vh">
       <LayoutSider
-        v-model:collapsed="collapsed"
+        :collapsed="collapsed"
         collapsible
         width="256"
         theme="light"
         class="border-r"
+        @collapse="toggleMenu"
       >
         <div class="pt-8 pb-10 px-2">
           <div class="h-12 w-full rounded-md overflow-hidden">

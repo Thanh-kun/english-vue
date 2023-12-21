@@ -1,4 +1,4 @@
-import { h, computed, ref } from 'vue'
+import { h, computed } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import {
   UserOutlined,
@@ -8,9 +8,12 @@ import {
   AppstoreOutlined,
   LoginOutlined
 } from '@ant-design/icons-vue'
+import { useTheme } from '@/stores/theme'
 
 export default function useSidebar() {
   const route = useRoute()
+  const themeStore = useTheme()
+
   const menuItems = [
     {
       label: h(RouterLink, { to: '/admin' }, { default: () => 'Dashboard' }),
@@ -48,11 +51,15 @@ export default function useSidebar() {
     return menuItems.filter((item) => route.path === item.key).map((item) => item.key)
   })
 
-  const collapsed = ref(false)
+  const collapsed = computed(() => themeStore.collapsedMenu)
+  const toggleMenu = () => {
+    themeStore.toggleMenu()
+  }
 
   return {
     selectedKeys,
     menuItems,
-    collapsed
+    collapsed,
+    toggleMenu
   }
 }

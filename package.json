@@ -17,6 +17,7 @@
     "ant-design-vue": "^4.0.8",
     "dayjs": "^1.11.10",
     "pinia": "^2.1.7",
+    "pinia-plugin-persist": "^1.0.0",
     "vue": "^3.3.11",
     "vue-router": "^4.2.5"
   },
