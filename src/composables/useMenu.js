@@ -14,24 +14,24 @@ export default function useMenu() {
       key: '/'
     },
     {
-      label: 'Listen',
-      key: '/listen',
+      label: h(RouterLink, { to: '/listening' }, { default: () => 'Listen' }),
+      key: '/listening',
       children: [
         {
           label: h(RouterLink, { to: '/admin' }, { default: () => 'Part 1: Photographs' }),
-          key: '/listen/photographs'
+          key: '/listening/photographs'
         },
         {
           label: h(RouterLink, { to: '/admin' }, { default: () => 'Part 2: Question-Response' }),
-          key: '/listen/question-response'
+          key: '/listening/question-response'
         },
         {
           label: h(RouterLink, { to: '/admin' }, { default: () => 'Part 3: Conversations' }),
-          key: '/listen/conversations'
+          key: '/listening/conversations'
         },
         {
           label: h(RouterLink, { to: '/admin' }, { default: () => 'Part 4: Talks' }),
-          key: '/listen/talks'
+          key: '/listening/talks'
         }
       ]
     },
