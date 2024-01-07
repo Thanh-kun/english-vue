@@ -71,6 +71,11 @@
   .bg-radial-gradient {
     background: radial-gradient(ellipse at center, #ffffff 0%, #dbeafe 100%);
   }
+
+  .bg-image1 {
+    background: url('../images/v960-ning-11.jpg') no-repeat center / cover;
+    opacity: 0.7;
+  }
 }
 
 @layer components {

@@ -1,0 +1,63 @@
+<script setup>
+import { reactive } from 'vue'
+import { Form, FormItem, Input, Button } from 'ant-design-vue'
+
+const formData = reactive({
+  username: '',
+  password: ''
+})
+
+const rules = {
+  username: [{ required: true, message: 'Please input your username!' }],
+  password: [
+    {
+      pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+      message:
+        'The password must be at least eight characters long, containing at least one letter and one number'
+    },
+    { required: true, message: 'Please input your password!' }
+  ]
+}
+
+const handleSubmit = () => {
+  console.log('submit', formData)
+}
+</script>
+<template>
+  <div style="min-height: calc(100dvh - 60px)" class="bg-image1">
+    <div class="container py-16 h-full flex items-center justify-center">
+      <div class="max-w-lg w-full bg-white rounded-md py-8 px-4">
+        <h1 class="text-2xl font-bold text-center">Sign in</h1>
+        <Form
+          layout="vertical"
+          class="mb-5"
+          autocomplete="off"
+          :rules="rules"
+          :model="formData"
+          @submit="handleSubmit"
+        >
+          <FormItem label="Username: " name="username">
+            <Input v-model:value="formData.username" autocomplete="username" />
+          </FormItem>
+          <FormItem label="Password: " name="password">
+            <Input
+              type="password"
+              v-model:value="formData.password"
+              autocomplete="current-password"
+            />
+          </FormItem>
+          <div class="flex justify-end mb-4">
+            <RouterLink to="/" href="#">Forgot password</RouterLink>
+          </div>
+          <FormItem>
+            <Button htmlType="submit" block type="primary">Confirm</Button>
+          </FormItem>
+        </Form>
+        <div>
+          <span class="mr-2">Don't have account?</span>
+          <RouterLink to="/" href="#" class="no-underline">Register</RouterLink>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

@@ -21,7 +21,7 @@ const { menuItems: menuMobileItems, selectedItems: selectedMobileItems } = useMe
 <template>
   <header class="sticky top-0 z-40">
     <div class="bg-white shadow-md z-1 bg-opacity-90">
-      <div class="container mx-auto">
+      <div class="container mx-auto h-[60px]">
         <div class="flex items-center gap-6">
           <RouterLink to="/">
             <div class="h-14 w-fit min-w-24 py-3">
@@ -32,10 +32,12 @@ const { menuItems: menuMobileItems, selectedItems: selectedMobileItems } = useMe
             <Menu :items="menuItems" :selectedItems="selectedItems" />
             <div class="flex divide-x border-gray-600">
               <div>
-                <Button type="link">Đăng nhập</Button>
+                <RouterLink :to="{ name: 'signIn' }">
+                  <Button type="link">Sign in</Button>
+                </RouterLink>
               </div>
               <div>
-                <Button type="link">Đăng ký</Button>
+                <Button type="link">Sign up</Button>
               </div>
               <RouterLink to="/" class="no-underline text-black hover:text-gray-800">
                 <div
