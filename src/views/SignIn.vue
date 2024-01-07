@@ -28,9 +28,12 @@ onMounted(() => {
 })
 </script>
 <template>
-  <div style="min-height: calc(100dvh - 60px)" class="bg-image1">
+  <div
+    style="min-height: calc(100dvh - 60px)"
+    class="bg-gradient-to-br from-primary-200 via-primary-50 to-pink-200"
+  >
     <div class="container py-16 h-full flex items-center justify-center">
-      <div class="max-w-lg w-full bg-white rounded-md py-8 px-4">
+      <div class="max-w-lg w-full bg-white rounded-md py-8 px-4 shadow-md border">
         <h1 class="text-2xl font-bold text-center">Sign in</h1>
         <Form
           layout="vertical"
@@ -38,7 +41,7 @@ onMounted(() => {
           autocomplete="off"
           :rules="rules"
           :model="formData"
-          @submit="handleSubmit"
+          @finish="handleSubmit"
         >
           <FormItem label="Username: " name="username">
             <Input v-model:value="formData.username" autocomplete="username" />
@@ -51,7 +54,7 @@ onMounted(() => {
             />
           </FormItem>
           <div class="flex justify-end mb-4">
-            <RouterLink to="/" href="#">Forgot password</RouterLink>
+            <RouterLink to="/forgot-password" href="#">Forgot password</RouterLink>
           </div>
           <FormItem>
             <Button htmlType="submit" block type="primary">Submit</Button>
