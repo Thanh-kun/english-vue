@@ -36,20 +36,20 @@ export default function useMenu() {
       ]
     },
     {
-      label: 'Read',
-      key: '/read',
+      label: h(RouterLink, { to: '/reading' }, { default: () => 'Read' }),
+      key: '/reading',
       children: [
         {
           label: h(RouterLink, { to: '/admin' }, { default: () => 'Part 5: Incomplete Sentences' }),
-          key: '/listen/photographs'
+          key: '/reading/photographs'
         },
         {
           label: h(RouterLink, { to: '/admin' }, { default: () => 'Part 6: Text Completion' }),
-          key: '/listen/question-response'
+          key: '/reading/question-response'
         },
         {
           label: h(RouterLink, { to: '/admin' }, { default: () => 'Part 7: Passages' }),
-          key: '/listen/conversations'
+          key: '/reading/conversations'
         }
       ]
     },
