@@ -4,8 +4,14 @@ import { fontFamily } from 'tailwindcss/defaultTheme'
 export const themeColors = {
   primary: colors.blue,
   gray: colors.gray,
+  red: colors.red,
+  yellow: colors.yellow,
+  green: colors.green,
+  purple: colors.purple,
+  pink: colors.pink,
   white: colors.white,
-  black: colors.black
+  black: colors.black,
+  transparent: colors.transparent
 }
 export const themeFontFamily = {
   primary: ['Nunito Variable', ...fontFamily.sans]

@@ -1,0 +1,31 @@
+#planet-svg {
+  top: 10%;
+  left: 10%;
+}
+
+#plus-svg {
+  top: 86%;
+  left: 50%;
+  transform: rotate(33deg);
+}
+
+#shape1-svg {
+  top: 76%;
+  left: 100%;
+  transform: rotate(33deg);
+}
+
+#shape2-svg {
+  top: 60%;
+  left: 5%;
+  transform: rotate(33deg);
+}
+
+@keyframes rotate-45 {
+  from {
+    transform: rotate(0, 0deg);
+  }
+  to {
+    transform: rotate(0, -360deg);
+  }
+}
