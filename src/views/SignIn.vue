@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from 'vue'
+import { onMounted, reactive } from 'vue'
 import { Form, FormItem, Input, Button } from 'ant-design-vue'
 
 const formData = reactive({
@@ -22,6 +22,10 @@ const rules = {
 const handleSubmit = () => {
   console.log('submit', formData)
 }
+
+onMounted(() => {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+})
 </script>
 <template>
   <div style="min-height: calc(100dvh - 60px)" class="bg-image1">
@@ -50,12 +54,12 @@ const handleSubmit = () => {
             <RouterLink to="/" href="#">Forgot password</RouterLink>
           </div>
           <FormItem>
-            <Button htmlType="submit" block type="primary">Confirm</Button>
+            <Button htmlType="submit" block type="primary">Submit</Button>
           </FormItem>
         </Form>
         <div>
           <span class="mr-2">Don't have account?</span>
-          <RouterLink to="/" href="#" class="no-underline">Register</RouterLink>
+          <RouterLink to="/sign-up" class="no-underline">Register</RouterLink>
         </div>
       </div>
     </div>

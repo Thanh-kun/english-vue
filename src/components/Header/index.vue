@@ -37,7 +37,9 @@ const { menuItems: menuMobileItems, selectedItems: selectedMobileItems } = useMe
                 </RouterLink>
               </div>
               <div>
-                <Button type="link">Sign up</Button>
+                <RouterLink :to="{ name: 'signUp' }">
+                  <Button type="link">Sign up</Button>
+                </RouterLink>
               </div>
               <RouterLink to="/" class="no-underline text-black hover:text-gray-800">
                 <div
