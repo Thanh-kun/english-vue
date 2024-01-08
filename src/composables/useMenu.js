@@ -54,7 +54,7 @@ export default function useMenu() {
       ]
     },
     {
-      label: 'Test',
+      label: h(RouterLink, { to: '/test' }, { default: () => 'Test' }),
       key: '/test',
       children: [
         {
