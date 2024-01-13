@@ -34,6 +34,21 @@ const router = createRouter({
       component: () => import('@/views/Listening/index.vue')
     },
     {
+      path: '/listening/overview',
+      name: 'listeningOverview',
+      component: () => import('@/views/Listening/overview.vue')
+    },
+    {
+      path: '/listening/test',
+      name: 'listeningTest',
+      component: () => import('@/views/Listening/test.vue')
+    },
+    {
+      path: '/listening/lesson',
+      name: 'listeningLesson',
+      component: () => import('@/views/Listening/lesson.vue')
+    },
+    {
       path: '/reading',
       name: 'reading',
       component: () => import('@/views/Reading/index.vue')
