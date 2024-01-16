@@ -4,7 +4,7 @@ import { Footer, Header } from '@/components'
 <template>
   <div>
     <Header />
-    <div>
+    <div style="min-height: calc(100vh - 60px)">
       <slot />
     </div>
     <Footer />

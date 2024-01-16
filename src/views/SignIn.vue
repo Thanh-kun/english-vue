@@ -1,26 +1,53 @@
 <script setup>
-import { onMounted, reactive } from 'vue'
-import { Form, FormItem, Input, Button } from 'ant-design-vue'
+import { onMounted, reactive, ref } from 'vue'
+import { Form, FormItem, Input, Button, notification } from 'ant-design-vue'
+import { authApi } from '@/services'
+import { useUser } from '@/stores/user'
+import { useRouter } from 'vue-router'
 
+// Reactive
+const userStore = useUser()
+const router = useRouter()
+
+const loading = ref(false)
 const formData = reactive({
   username: '',
   password: ''
 })
 
+// Validate Form
 const rules = {
   username: [{ required: true, message: 'Please input your username!' }],
-  password: [
-    {
-      pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
-      message:
-        'The password must be at least eight characters long, containing at least one letter and one number'
-    },
-    { required: true, message: 'Please input your password!' }
-  ]
+  password: [{ required: true, message: 'Please input your password!' }]
 }
 
-const handleSubmit = () => {
-  console.log('submit', formData)
+// Method
+const handleSubmit = async () => {
+  try {
+    loading.value = true
+    let data = {
+      username: formData.username,
+      password: formData.password
+    }
+    let response = await authApi.signIn(data)
+    if (response.data && response.data.success === true && response.data.data?.access_token) {
+      userStore.setToken('Bearer ' + response.data.data.access_token)
+      userStore.setUser(response.data.data)
+
+      notification.success({
+        message: 'Login successful! 🎉',
+        description: 'Hava a nice day!'
+      })
+      router.push('/')
+    } else throw new Error(response.data?.message)
+  } catch (err) {
+    notification.error({
+      message: 'Login failed, please try again!',
+      description: err.message
+    })
+  } finally {
+    loading.value = false
+  }
 }
 
 onMounted(() => {
@@ -57,7 +84,7 @@ onMounted(() => {
             <RouterLink to="/forgot-password" href="#">Forgot password</RouterLink>
           </div>
           <FormItem>
-            <Button htmlType="submit" block type="primary">Submit</Button>
+            <Button htmlType="submit" block type="primary" :loading="loading">Submit</Button>
           </FormItem>
         </Form>
         <div>

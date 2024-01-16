@@ -8,16 +8,19 @@
             <div class="font-sans">
               <b>1. Question type</b>
               <p>
-                In this part, you are asked to see a picture and choose the statement that most describes the picture. To
-                be
-                able to choose the correct answer, you should think of the topic of the picture and possible statements.
+                In this part, you are asked to see a picture and choose the statement that most
+                describes the picture. To be able to choose the correct answer, you should think of
+                the topic of the picture and possible statements.
               </p>
               <b>2. Guide to answer</b>
-              <p>- Before the beginning of the section, think of the theme of the picture as well as brainstorm nouns and
-                verbs related to the picture. You should do this because most distractors in the TOEIC part 1 involve the
-                wrong noun or verb.</p>
               <p>
-                - Before listening, you also should predict possible statements. Most statements are about:
+                - Before the beginning of the section, think of the theme of the picture as well as
+                brainstorm nouns and verbs related to the picture. You should do this because most
+                distractors in the TOEIC part 1 involve the wrong noun or verb.
+              </p>
+              <p>
+                - Before listening, you also should predict possible statements. Most statements are
+                about:
               </p>
               <p>+ The activity</p>
               <p>E.g. The man is writing an email.</p>
@@ -36,19 +39,34 @@
           <div class="bg-white py-4 px-4 rounded-md shadow border mb-2">
             <h2 class="text-xl font-bold mb-2">Lessons</h2>
             <div>
-              <a href="#" class="block no-underline text-black p-4 border-b border-gray-300 border-dashed">
+              <a
+                href="#"
+                class="block no-underline text-black p-4 border-b border-gray-300 border-dashed"
+              >
                 Lesson 1: Predict what you will hear
               </a>
-              <a href="#" class="block no-underline text-black p-4 border-b border-gray-300 border-dashed">
+              <a
+                href="#"
+                class="block no-underline text-black p-4 border-b border-gray-300 border-dashed"
+              >
                 Lesson 1: Predict what you will hear
               </a>
-              <a href="#" class="block no-underline text-black p-4 border-b border-gray-300 border-dashed">
+              <a
+                href="#"
+                class="block no-underline text-black p-4 border-b border-gray-300 border-dashed"
+              >
                 Lesson 1: Predict what you will hear
               </a>
-              <a href="#" class="block no-underline text-black p-4 border-b border-gray-300 border-dashed">
+              <a
+                href="#"
+                class="block no-underline text-black p-4 border-b border-gray-300 border-dashed"
+              >
                 Lesson 1: Predict what you will hear
               </a>
-              <a href="#" class="block no-underline text-black p-4 border-b border-gray-300 border-dashed">
+              <a
+                href="#"
+                class="block no-underline text-black p-4 border-b border-gray-300 border-dashed"
+              >
                 Lesson 1: Predict what you will hear
               </a>
             </div>

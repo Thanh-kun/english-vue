@@ -1,14 +1,21 @@
 <script setup>
-import { computed, reactive, onMounted } from 'vue'
-import { Form, FormItem, Input, Button } from 'ant-design-vue'
+import { computed, reactive, onMounted, ref } from 'vue'
+import { Form, FormItem, Input, Button, notification } from 'ant-design-vue'
+import { authApi } from '@/services'
+import Swal from 'sweetalert2'
+import { useRouter } from 'vue-router'
 
+// Reactive
+const router = useRouter()
+const loading = ref(false)
 const formData = reactive({
-  name: '',
+  fullname: '',
   email: '',
   password: '',
   confirmPassword: ''
 })
 
+// Validate Form
 const validatePass = async (_rule, value) => {
   if (value === '') {
     return Promise.reject('Please input the password again')
@@ -18,9 +25,8 @@ const validatePass = async (_rule, value) => {
     return Promise.resolve()
   }
 }
-
 const rules = computed(() => ({
-  name: [{ required: true, message: 'Please input your name!' }],
+  fullname: [{ required: true, message: 'Please input your name!' }],
   email: [
     { required: true, message: 'Please input your email!' },
     {
@@ -30,24 +36,47 @@ const rules = computed(() => ({
   ],
   password: [
     {
-      pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+      pattern: /^.{8,}$/,
       message:
         'The password must be at least eight characters long, containing at least one letter and one number'
     },
     { required: true, message: 'Please input your password!' }
   ],
-  confirmPassword: [
-    {
-      pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
-      message:
-        'The password must be at least eight characters long, containing at least one letter and one number'
-    },
-    { validator: validatePass, message: 'The passwords do not match!' }
-  ]
+  confirmPassword: [{ validator: validatePass, message: 'The passwords do not match!' }]
 }))
 
-const handleSubmit = () => {
-  console.log('submit', formData)
+// Method
+const handleSubmit = async () => {
+  try {
+    loading.value = true
+    let data = {
+      username: formData.email,
+      fullname: formData.fullname,
+      password: formData.password,
+      confirmPassword: formData.confirmPassword
+    }
+    let response = await authApi.signUp(data)
+    if (response.data && response.data.success === true) {
+      notification.success({
+        message: 'Registration successful! 🎉',
+        description: 'Please log in again!'
+      })
+      Swal.fire({
+        icon: 'success',
+        title: 'Registration successful',
+        showConfirmButton: false,
+        timer: 1000
+      })
+      router.push('/')
+    } else throw new Error(response.data?.message)
+  } catch (err) {
+    notification.error({
+      message: 'An error occurred, please try again!',
+      description: err.message
+    })
+  } finally {
+    loading.value = false
+  }
 }
 
 onMounted(() => {
@@ -70,8 +99,8 @@ onMounted(() => {
           :model="formData"
           @finish="handleSubmit"
         >
-          <FormItem label="Name: " name="name">
-            <Input v-model:value="formData.name" autocomplete="name" />
+          <FormItem label="Name: " name="fullname">
+            <Input v-model:value="formData.fullname" autocomplete="name" />
           </FormItem>
           <FormItem label="Email: " name="email">
             <Input v-model:value="formData.email" autocomplete="email" />
@@ -87,7 +116,7 @@ onMounted(() => {
             />
           </FormItem>
           <FormItem>
-            <Button htmlType="submit" block type="primary">Submit</Button>
+            <Button htmlType="submit" block type="primary" :loading="loading">Submit</Button>
           </FormItem>
         </Form>
         <div>
