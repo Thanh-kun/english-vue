@@ -2,7 +2,9 @@
 import AppLayout from './layouts/AppLayout.vue'
 </script>
 <template>
-  <AppLayout>
-    <RouterView />
-  </AppLayout>
+  <Suspense>
+    <AppLayout>
+      <RouterView />
+    </AppLayout>
+  </Suspense>
 </template>

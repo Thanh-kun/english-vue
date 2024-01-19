@@ -1,73 +1,75 @@
-import { computed, h } from 'vue'
+import { ref, watch, h, computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
+import { usePart } from '@/stores/part'
 
 export default function useMenu() {
   const route = useRoute()
+  const partStore = usePart()
 
-  const selectedItems = computed(() => {
-    return menuItems.filter((item) => route.path === item.key).map((item) => item.key)
+  const listeningRoutes = computed(() => {
+    return partStore.listeningParts.map((item) => ({
+      label: h(
+        RouterLink,
+        { to: '/listening/' + item.id },
+        { default: () => `${item.sub_name}: ${item.name}` }
+      ),
+      key: '/listening/' + item.id
+    }))
   })
 
-  const menuItems = [
-    {
-      label: h(RouterLink, { to: '/' }, { default: () => 'Home' }),
-      key: '/'
-    },
-    {
-      label: h(RouterLink, { to: '/listening' }, { default: () => 'Listen' }),
-      key: '/listening',
-      children: [
+  const readingRoutes = computed(() => {
+    return partStore.readingParts.map((item) => ({
+      label: h(
+        RouterLink,
+        { to: '/listening/' + item.id },
+        { default: () => `${item.sub_name}: ${item.name}` }
+      ),
+      key: '/listening/' + item.id
+    }))
+  })
+
+  const menuItems = ref([])
+
+  const selectedItems = computed(() => {
+    return menuItems.value.filter((item) => route.path === item.key).map((item) => item.key)
+  })
+
+  watch(
+    [listeningRoutes, readingRoutes],
+    () => {
+      menuItems.value = [
         {
-          label: h(RouterLink, { to: '/admin' }, { default: () => 'Part 1: Photographs' }),
-          key: '/listening/photographs'
+          label: h(RouterLink, { to: '/' }, { default: () => 'Home' }),
+          key: '/'
         },
         {
-          label: h(RouterLink, { to: '/admin' }, { default: () => 'Part 2: Question-Response' }),
-          key: '/listening/question-response'
+          label: h(RouterLink, { to: '/listening' }, { default: () => 'Listen' }),
+          key: '/listening',
+          children: listeningRoutes.value
         },
         {
-          label: h(RouterLink, { to: '/admin' }, { default: () => 'Part 3: Conversations' }),
-          key: '/listening/conversations'
+          label: h(RouterLink, { to: '/reading' }, { default: () => 'Read' }),
+          key: '/reading',
+          children: readingRoutes.value
         },
         {
-          label: h(RouterLink, { to: '/admin' }, { default: () => 'Part 4: Talks' }),
-          key: '/listening/talks'
+          label: h(RouterLink, { to: '/test' }, { default: () => 'Test' }),
+          key: '/test',
+          children: [
+            {
+              label: h(RouterLink, { to: '/admin' }, { default: () => 'Mini Test' }),
+              key: '/test/mini-test'
+            },
+            {
+              label: h(RouterLink, { to: '/admin' }, { default: () => 'Full Test' }),
+              key: '/test/full-test'
+            }
+          ]
         }
       ]
     },
-    {
-      label: h(RouterLink, { to: '/reading' }, { default: () => 'Read' }),
-      key: '/reading',
-      children: [
-        {
-          label: h(RouterLink, { to: '/admin' }, { default: () => 'Part 5: Incomplete Sentences' }),
-          key: '/reading/photographs'
-        },
-        {
-          label: h(RouterLink, { to: '/admin' }, { default: () => 'Part 6: Text Completion' }),
-          key: '/reading/question-response'
-        },
-        {
-          label: h(RouterLink, { to: '/admin' }, { default: () => 'Part 7: Passages' }),
-          key: '/reading/conversations'
-        }
-      ]
-    },
-    {
-      label: h(RouterLink, { to: '/test' }, { default: () => 'Test' }),
-      key: '/test',
-      children: [
-        {
-          label: h(RouterLink, { to: '/admin' }, { default: () => 'Mini Test' }),
-          key: '/test/mini-test'
-        },
-        {
-          label: h(RouterLink, { to: '/admin' }, { default: () => 'Full Test' }),
-          key: '/test/full-test'
-        }
-      ]
-    }
-  ]
+    { immediate: true }
+  )
 
   return {
     menuItems,

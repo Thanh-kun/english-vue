@@ -1,6 +1,9 @@
 <script setup>
 import { Button } from 'ant-design-vue'
 import { SparklesIcon } from '@heroicons/vue/24/outline'
+import Part from '@/components/Part.vue'
+import { usePart } from '@/stores/part'
+const partStore = usePart()
 </script>
 <template>
   <div>
@@ -202,189 +205,11 @@ import { SparklesIcon } from '@heroicons/vue/24/outline'
           </div>
           <div class="mb-8">
             <h4 class="text-xl mb-4">Listening</h4>
-            <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-              <a
-                href="#"
-                class="shadow border rounded-3xl text-black no-underline group/card bg-white transition-shadow duration-300 hover:text-black hover:shadow-md"
-              >
-                <div class="h-48 overflow-hidden rounded-t-3xl">
-                  <img
-                    src="../assets/images/image1.webp"
-                    class="h-full w-full object-cover transition-all duration-300 group-hover/card:scale-110"
-                    loading="lazy"
-                  />
-                </div>
-                <div class="p-4">
-                  <h3 class="text-xl font-bold">Part 1</h3>
-                  <h4 class="text-lg font-bold mb-2">Photographs</h4>
-                  <p
-                    class="line-clamp-4"
-                    title="Four short statements regarding a photograph will be spoken only one time. The statements will not be printed. Of these four statements, select the one that best describes the photograph and mark your answer on the answer sheet."
-                  >
-                    Four short statements regarding a photograph will be spoken only one time. The
-                    statements will not be printed. Of these four statements, select the one that
-                    best describes the photograph and mark your answer on the answer sheet.
-                  </p>
-                </div>
-              </a>
-              <a
-                href="#"
-                class="shadow border rounded-3xl text-black no-underline group/card bg-white transition-shadow duration-300 hover:text-black hover:shadow-md"
-              >
-                <div class="h-48 overflow-hidden rounded-t-3xl">
-                  <img
-                    src="../assets/images/image2.webp"
-                    class="h-48 w-full object-cover rounded-t-3xl transition-all duration-300 group-hover/card:scale-110"
-                    loading="lazy"
-                  />
-                </div>
-                <div class="p-4">
-                  <h3 class="text-xl font-bold">Part 2</h3>
-                  <h4 class="text-lg font-bold mb-2">Question-Response</h4>
-                  <p
-                    class="line-clamp-4"
-                    title="Three responses to one question or statement will be spoken only one time. They will not be printed. Select the best response for the question, and mark your answer on the answer sheet."
-                  >
-                    Three responses to one question or statement will be spoken only one time. They
-                    will not be printed. Select the best response for the question, and mark your
-                    answer on the answer sheet.
-                  </p>
-                </div>
-              </a>
-              <a
-                href="#"
-                class="shadow border rounded-3xl text-black no-underline group/card bg-white transition-shadow duration-300 hover:text-black hover:shadow-md"
-              >
-                <div class="h-48 overflow-hidden rounded-t-3xl">
-                  <img
-                    src="../assets/images/image3.webp"
-                    class="h-48 w-full object-cover rounded-t-3xl transition-all duration-300 group-hover/card:scale-110"
-                    loading="lazy"
-                  />
-                </div>
-                <div class="p-4">
-                  <h3 class="text-xl font-bold">Part 3</h3>
-                  <h4 class="text-lg font-bold mb-2">Conversations</h4>
-                  <p
-                    class="line-clamp-4"
-                    title="Conversations between two or three people will be spoken only one time. They will not be printed. Listen to each conversation and read the questions printed in the test book (the questions will also be spoken), select the best response for the question, and mark your answer on the answer sheet. Some questions may require responses related to information found in diagrams,etc. printed on the test book as well as what you heard in the conversations. There are three questions for each conversation."
-                  >
-                    Conversations between two or three people will be spoken only one time. They
-                    will not be printed. Listen to each conversation and read the questions printed
-                    in the test book (the questions will also be spoken), select the best response
-                    for the question, and mark your answer on the answer sheet. Some questions may
-                    require responses related to information found in diagrams,etc. printed on the
-                    test book as well as what you heard in the conversations. There are three
-                    questions for each conversation.
-                  </p>
-                </div>
-              </a>
-              <a
-                href="#"
-                class="shadow border rounded-3xl text-black no-underline group/card bg-white transition-shadow duration-300 hover:text-black hover:shadow-md"
-              >
-                <div class="h-48 overflow-hidden rounded-t-3xl">
-                  <img
-                    src="../assets/images/image4.webp"
-                    class="h-48 w-full object-cover rounded-t-3xl transition-all duration-300 group-hover/card:scale-110"
-                    loading="lazy"
-                  />
-                </div>
-                <div class="p-4">
-                  <h3 class="text-xl font-bold">Part 4</h3>
-                  <h4 class="text-lg font-bold mb-2">Talks</h4>
-                  <p
-                    title="Short talks such as announcements or narrations will be spoken only one time. They will not be printed. Listen to each talk and read the questions printed in the test book (the questions will also be spoken), select the best response for the question, and mark your answer on the answer sheet. Some questions may require responses related to information found in diagrams, etc. printed on the test book as well as what you heard in the talks. There are three questions for each talk."
-                    class="line-clamp-4"
-                  >
-                    Short talks such as announcements or narrations will be spoken only one time.
-                    They will not be printed. Listen to each talk and read the questions printed in
-                    the test book (the questions will also be spoken), select the best response for
-                    the question, and mark your answer on the answer sheet. Some questions may
-                    require responses related to information found in diagrams, etc. printed on the
-                    test book as well as what you heard in the talks. There are three questions for
-                    each talk.
-                  </p>
-                </div>
-              </a>
-            </div>
+            <Part :parts="partStore.listeningParts" />
           </div>
           <div>
             <h4 class="text-xl mb-4">Reading</h4>
-            <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-              <a
-                href="#"
-                class="shadow border rounded-3xl text-black no-underline group/card bg-white transition-shadow duration-300 hover:text-black hover:shadow-md"
-              >
-                <div class="h-48 overflow-hidden rounded-t-3xl">
-                  <img
-                    src="../assets/images/image5.webp"
-                    class="h-48 w-full object-cover rounded-t-3xl transition-all duration-300 group-hover/card:scale-110"
-                    loading="lazy"
-                  />
-                </div>
-                <div class="p-4">
-                  <h3 class="text-xl font-bold">Part 5</h3>
-                  <h4 class="text-lg font-bold mb-2">Incomplete Sentences</h4>
-                  <p
-                    class="line-clamp-4"
-                    title="Select the best answer of the four choices to complete the sentence, and mark your answer on the answer sheet."
-                  >
-                    Select the best answer of the four choices to complete the sentence, and mark
-                    your answer on the answer sheet.
-                  </p>
-                </div>
-              </a>
-              <a
-                href="#"
-                class="shadow border rounded-3xl text-black no-underline group/card bg-white transition-shadow duration-300 hover:text-black hover:shadow-md"
-              >
-                <div class="h-48 overflow-hidden rounded-t-3xl">
-                  <img
-                    src="../assets/images/image6.webp"
-                    class="h-48 w-full object-cover rounded-t-3xl transition-all duration-300 group-hover/card:scale-110"
-                    loading="lazy"
-                  />
-                </div>
-                <div class="p-4">
-                  <h3 class="text-xl font-bold">Part 6</h3>
-                  <h4 class="text-lg font-bold mb-2">Text Completion</h4>
-                  <p
-                    class="line-clamp-4"
-                    title="Select the best answer of the four choices (words, phrases, or a sentence) to complete the text, and mark your answer on the answer sheet. There are four questions for each text."
-                  >
-                    Select the best answer of the four choices (words, phrases, or a sentence) to
-                    complete the text, and mark your answer on the answer sheet. There are four
-                    questions for each text.
-                  </p>
-                </div>
-              </a>
-              <a
-                href="#"
-                class="shadow border rounded-3xl text-black no-underline group/card bg-white transition-shadow duration-300 hover:text-black hover:shadow-md"
-              >
-                <div class="h-48 overflow-hidden rounded-t-3xl">
-                  <img
-                    src="../assets/images/image7.webp"
-                    class="h-48 w-full object-cover rounded-t-3xl transition-all duration-300 group-hover/card:scale-110"
-                    loading="lazy"
-                  />
-                </div>
-                <div class="p-4">
-                  <h3 class="text-xl font-bold">Part 7</h3>
-                  <h4 class="text-lg font-bold mb-2">Passages</h4>
-                  <p
-                    class="line-clamp-4"
-                    title="A range of different texts will be printed in the test book. Read the questions, select the best answer of the four choices, and mark your answer on the answer sheet. Some questions may require you to select the best place to insert a sentence within a text. There are multiple questions for each text."
-                  >
-                    A range of different texts will be printed in the test book. Read the questions,
-                    select the best answer of the four choices, and mark your answer on the answer
-                    sheet. Some questions may require you to select the best place to insert a
-                    sentence within a text. There are multiple questions for each text.
-                  </p>
-                </div>
-              </a>
-            </div>
+            <Part :parts="partStore.readingParts" />
           </div>
         </div>
       </div>

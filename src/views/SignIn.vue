@@ -2,7 +2,7 @@
 import { onMounted, reactive, ref } from 'vue'
 import { Form, FormItem, Input, Button, notification } from 'ant-design-vue'
 import { authApi } from '@/services'
-import { useUser } from '@/stores/user'
+import { useUser } from '@/stores'
 import { useRouter } from 'vue-router'
 
 // Reactive
@@ -31,8 +31,7 @@ const handleSubmit = async () => {
     }
     let response = await authApi.signIn(data)
     if (response.data && response.data.success === true && response.data.data?.access_token) {
-      userStore.setToken('Bearer ' + response.data.data.access_token)
-      userStore.setUser(response.data.data)
+      userStore.setToken(response.data.data.access_token)
 
       notification.success({
         message: 'Login successful! 🎉',

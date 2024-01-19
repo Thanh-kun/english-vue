@@ -1,15 +1,17 @@
 import adminHost from '@/services/host/server'
 
 class AuthApi {
-  getUser(data, headers) {
+  getUser(headers) {
     let url = '/user'
     return adminHost.get(url, headers)
   }
+
   signIn(data, headers) {
     let url = '/auth/login'
     let { username, password } = data
     return adminHost.post(url, { username, password }, headers)
   }
+
   signUp(data, headers) {
     let url = '/auth/sign-up'
     let { username, password, confirmPassword, fullname } = data

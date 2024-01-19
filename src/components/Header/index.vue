@@ -1,9 +1,10 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { Button } from 'ant-design-vue'
 import { LogoText, Menu, MenuButton, Menu2 } from '@/components'
 import { useMenuMobile, useMenu } from '@/composables'
 import { RouterLink } from 'vue-router'
+import { useUser } from '@/stores'
 
 const isUnfold = ref(false)
 
@@ -17,6 +18,11 @@ const handleCloseMenu = () => {
 
 const { menuItems, selectedItems } = useMenu()
 const { menuItems: menuMobileItems, selectedItems: selectedMobileItems } = useMenuMobile()
+const userStore = useUser()
+
+const isAuth = computed(() => {
+  return userStore.isAuth
+})
 </script>
 <template>
   <header class="sticky top-0 z-40">
@@ -30,7 +36,7 @@ const { menuItems: menuMobileItems, selectedItems: selectedMobileItems } = useMe
           </RouterLink>
           <div class="items-center gap-4 ml-auto hidden lg:flex">
             <Menu :items="menuItems" :selectedItems="selectedItems" />
-            <div class="flex divide-x border-gray-600">
+            <div class="flex divide-x border-gray-600" v-if="!isAuth">
               <div>
                 <RouterLink :to="{ name: 'signIn' }">
                   <Button type="link">Sign in</Button>
@@ -41,14 +47,14 @@ const { menuItems: menuMobileItems, selectedItems: selectedMobileItems } = useMe
                   <Button type="link">Sign up</Button>
                 </RouterLink>
               </div>
-              <RouterLink to="/" class="no-underline text-black hover:text-gray-800">
-                <div
-                  class="flex-shrink-0 flex items-center justify-center text-white w-10 h-10 bg-primary-300 rounded-full overflow-x-hidden"
-                >
-                  <span> L </span>
-                </div>
-              </RouterLink>
             </div>
+            <RouterLink to="/" class="no-underline text-black hover:text-gray-800" v-else>
+              <div
+                class="flex-shrink-0 flex items-center justify-center text-white w-10 h-10 bg-primary-300 rounded-full overflow-x-hidden"
+              >
+                <span> L </span>
+              </div>
+            </RouterLink>
           </div>
           <div class="ml-auto block lg:hidden">
             <div

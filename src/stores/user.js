@@ -6,6 +6,7 @@ export const useUser = defineStore(
   () => {
     const userInfo = ref('')
     const accessToken = ref('')
+    const isAuth = ref(false)
 
     function setUserInfo(userInfo) {
       accessToken.value = userInfo
@@ -13,14 +14,16 @@ export const useUser = defineStore(
 
     function setToken(token) {
       accessToken.value = token
+      isAuth.value = true
     }
 
     function clearToken() {
       accessToken.value = ''
       userInfo.value = ''
+      isAuth.value = false
     }
 
-    return { userInfo, accessToken, setUserInfo, setToken, clearToken }
+    return { userInfo, accessToken, isAuth, setUserInfo, setToken, clearToken }
   },
   {
     persist: {

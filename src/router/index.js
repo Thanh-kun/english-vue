@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUser } from '@/stores'
+import { authApi } from '@/services'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,26 +13,43 @@ const router = createRouter({
     {
       path: '/sign-in',
       name: 'signIn',
-      component: () => import('@/views/SignIn.vue')
+      component: () => import('@/views/SignIn.vue'),
+      meta: {
+        isProtect: true
+      }
     },
     {
       path: '/sign-up',
       name: 'signUp',
-      component: () => import('@/views/SignUp.vue')
+      component: () => import('@/views/SignUp.vue'),
+      meta: {
+        isProtect: true
+      }
     },
     {
       path: '/forgot-password',
       name: 'forgotPassword',
-      component: () => import('@/views/ForgotPassword.vue')
+      component: () => import('@/views/ForgotPassword.vue'),
+      meta: {
+        isProtect: true
+      }
     },
     {
       path: '/reset-password',
       name: 'resetPassword',
-      component: () => import('@/views/ResetPassword.vue')
+      component: () => import('@/views/ResetPassword.vue'),
+      meta: {
+        isProtect: true
+      }
     },
     {
       path: '/listening',
       name: 'listening',
+      component: () => import('@/views/Listening/index.vue')
+    },
+    {
+      path: '/listening/:id',
+      name: 'listeningItem',
       component: () => import('@/views/Listening/index.vue')
     },
     {
@@ -63,7 +82,8 @@ const router = createRouter({
       name: 'admin',
       component: () => import('@/views/admin/Dashboard.vue'),
       meta: {
-        layout: 'DashboardLayout'
+        layout: 'DashboardLayout',
+        isAdmin: true
       }
     },
     {
@@ -71,7 +91,8 @@ const router = createRouter({
       name: 'adminUser',
       component: () => import('@/views/admin/User.vue'),
       meta: {
-        layout: 'DashboardLayout'
+        layout: 'DashboardLayout',
+        isAdmin: true
       }
     },
     {
@@ -79,7 +100,8 @@ const router = createRouter({
       name: 'adminPart',
       component: () => import('@/views/admin/Part.vue'),
       meta: {
-        layout: 'DashboardLayout'
+        layout: 'DashboardLayout',
+        isAdmin: true
       }
     },
     {
@@ -87,7 +109,8 @@ const router = createRouter({
       name: 'adminLesson',
       component: () => import('@/views/admin/Lesson.vue'),
       meta: {
-        layout: 'DashboardLayout'
+        layout: 'DashboardLayout',
+        isAdmin: true
       }
     },
     {
@@ -95,10 +118,47 @@ const router = createRouter({
       name: 'adminQuestion',
       component: () => import('@/views/admin/Question/Search.vue'),
       meta: {
-        layout: 'DashboardLayout'
+        layout: 'DashboardLayout',
+        isAdmin: true
       }
     }
   ]
+})
+
+router.beforeEach(async (to, before, next) => {
+  const userStore = useUser()
+
+  if (to.meta.isAuth || to.meta.isAdmin) {
+    if (userStore.accessToken) {
+      try {
+        let response = await authApi.getUser()
+        if (response.status === 200 && response.data.data) {
+          userStore.setUserInfo(response.data?.data)
+          if (to.meta.isAdmin) {
+            if (userStore.userInfo.role === 'admin') {
+              return next()
+            }
+            userStore.clearToken()
+            return next('/')
+          }
+          return next()
+        }
+        throw new Error()
+      } catch (err) {
+        console.log(err)
+      }
+    } else {
+      userStore.clearToken()
+      return next('/')
+    }
+  }
+
+  if (to.meta.isProtect && userStore.accessToken) {
+    userStore.clearToken()
+    return next('/')
+  }
+
+  next()
 })
 
 export default router
