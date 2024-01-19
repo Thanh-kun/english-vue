@@ -1,9 +1,17 @@
 import adminHost from '@/services/host/server'
 
 class CommonApi {
-  getPart(header) {
+  getPart(headers) {
     let url = '/part'
-    return adminHost.get(url, header)
+    return adminHost.get(url, headers)
+  }
+  getLesson(partId, headers) {
+    let url = '/lesson/' + partId
+    return adminHost.get(url, headers)
+  }
+  getTest(partId, headers) {
+    let url = '/test/all/' + partId
+    return adminHost.get(url, headers)
   }
 }
 

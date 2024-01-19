@@ -48,23 +48,13 @@ const router = createRouter({
       component: () => import('@/views/Listening/index.vue')
     },
     {
-      path: '/listening/:id',
-      name: 'listeningItem',
-      component: () => import('@/views/Listening/index.vue')
-    },
-    {
-      path: '/listening/overview',
-      name: 'listeningOverview',
+      path: '/part/:id',
+      name: 'partItem',
       component: () => import('@/views/Listening/overview.vue')
     },
     {
-      path: '/listening/test',
-      name: 'listeningTest',
-      component: () => import('@/views/Listening/test.vue')
-    },
-    {
-      path: '/listening/lesson',
-      name: 'listeningLesson',
+      path: '/lesson/:partId/:lessonId',
+      name: 'lessonItem',
       component: () => import('@/views/Listening/lesson.vue')
     },
     {

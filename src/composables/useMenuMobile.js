@@ -13,10 +13,10 @@ export default function useMenu() {
     return partStore.listeningParts.map((item) => ({
       label: h(
         RouterLink,
-        { to: '/listening/' + item.id },
+        { to: '/part/' + item.id },
         { default: () => `${item.sub_name}: ${item.name}` }
       ),
-      key: '/listening/' + item.id
+      key: '/part/' + item.id
     }))
   })
 
@@ -24,10 +24,10 @@ export default function useMenu() {
     return partStore.readingParts.map((item) => ({
       label: h(
         RouterLink,
-        { to: '/listening/' + item.id },
+        { to: '/part/' + item.id },
         { default: () => `${item.sub_name}: ${item.name}` }
       ),
-      key: '/listening/' + item.id
+      key: '/part/' + item.id
     }))
   })
 

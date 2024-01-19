@@ -3,45 +3,31 @@ import { defineStore } from 'pinia'
 import { LISTENING, READING } from '@/constant/common'
 import { commonApi } from '@/services/index'
 
-export const usePart = defineStore(
-  'part',
-  () => {
-    const parts = ref([])
+export const usePart = defineStore('part', () => {
+  const parts = ref([])
 
-    const listeningParts = computed(() => {
-      return parts.value.filter((item) => item.type === LISTENING)
-    })
+  const listeningParts = computed(() => {
+    return parts.value.filter((item) => item.type === LISTENING)
+  })
 
-    const readingParts = computed(() => {
-      return parts.value.filter((item) => item.type === READING)
-    })
+  const readingParts = computed(() => {
+    return parts.value.filter((item) => item.type === READING)
+  })
 
-    const getPartsFromServer = async () => {
-      try {
-        let response = await commonApi.getPart()
-        if (response.status === 200 && response.data.success) {
-          parts.value = response.data?.data ?? []
-        }
-      } catch (err) {
-        console.log(err)
+  const getPartsFromServer = async () => {
+    try {
+      let response = await commonApi.getPart()
+      if (response.status === 200 && response.data.success) {
+        parts.value = response.data?.data ?? []
       }
-    }
-
-    const setPart = (newParts) => {
-      parts.value = newParts
-    }
-
-    return { parts, listeningParts, readingParts, getPartsFromServer, setPart }
-  },
-  {
-    persist: {
-      enabled: true,
-      strategies: [
-        {
-          key: 'user',
-          storage: localStorage
-        }
-      ]
+    } catch (err) {
+      console.log(err)
     }
   }
-)
+
+  const setPart = (newParts) => {
+    parts.value = newParts
+  }
+
+  return { parts, listeningParts, readingParts, getPartsFromServer, setPart }
+})

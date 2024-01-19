@@ -9,7 +9,7 @@ defineProps({
     <RouterLink
       v-for="part of parts"
       :key="part?.id"
-      :to="'listening/' + part?.id"
+      :to="'/part/' + part?.id"
       class="block no-underline"
     >
       <PartItem :imageUrl="part?.thumbnail">
