@@ -13,6 +13,12 @@ const props = defineProps({
   }
 })
 
+const emits = defineEmits(['close']);
+
+const handleClose = (e) => {
+  emits('close', e);
+}
+
 provide('selectedItems2', props.selectedItems)
 </script>
 <template>
@@ -26,7 +32,8 @@ provide('selectedItems2', props.selectedItems)
               {
                 active: selectedItems.includes(item.key),
                 children: item?.children,
-                onclick: item?.onClick
+                onclick: item?.onClick,
+                onClose: handleClose
               },
               { default: () => item.label }
             )

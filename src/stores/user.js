@@ -8,8 +8,8 @@ export const useUser = defineStore(
     const accessToken = ref('')
     const isAuth = ref(false)
 
-    function setUserInfo(userInfo) {
-      accessToken.value = userInfo
+    function setUserInfo(newUserInfo) {
+      userInfo.value = newUserInfo
     }
 
     function setToken(token) {

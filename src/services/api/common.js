@@ -13,6 +13,11 @@ class CommonApi {
     let url = '/test/all/' + partId
     return adminHost.get(url, headers)
   }
+  getMiniTest(data = {}, headers) {
+    const { partId = 1, limit = 50 } = data
+    let url = '/exam/mini-test?' + `part_id=${partId}&limit=${limit}`
+    return adminHost.get(url, headers);
+  }
 }
 
 const commonApi = new CommonApi()

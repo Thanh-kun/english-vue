@@ -68,6 +68,14 @@ const router = createRouter({
       component: () => import('@/views/Test/index.vue')
     },
     {
+      path: '/mini-test',
+      name: 'MiniTest',
+      component: () => import('@/views/Test/mini-test.vue'),
+      meta: {
+        layout: 'LessonLayout',
+      }
+    },
+    {
       path: '/admin',
       name: 'admin',
       component: () => import('@/views/admin/Dashboard.vue'),

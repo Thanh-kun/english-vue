@@ -32,6 +32,7 @@ const handleSubmit = async () => {
     let response = await authApi.signIn(data)
     if (response.data && response.data.success === true && response.data.data?.access_token) {
       userStore.setToken(response.data.data.access_token)
+      userStore.setUserInfo(response.data.data)
 
       notification.success({
         message: 'Login successful! 🎉',
