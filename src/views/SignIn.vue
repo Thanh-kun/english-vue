@@ -32,6 +32,7 @@ const handleSubmit = async () => {
     let response = await authApi.signIn(data)
     if (response.data && response.data.success === true && response.data.data?.access_token) {
       userStore.setToken(response.data.data.access_token)
+      userStore.setUserInfo(response.data.data)
 
       notification.success({
         message: 'Login successful! 🎉',
@@ -58,8 +59,8 @@ onMounted(() => {
     style="min-height: calc(100dvh - 60px)"
     class="bg-gradient-to-br from-primary-200 via-primary-50 to-pink-200"
   >
-    <div class="container py-16 h-full flex items-center justify-center">
-      <div class="max-w-lg w-full bg-white rounded-md py-8 px-4 shadow-md border">
+    <div class="container mx-auto py-16 h-full flex items-center justify-center">
+      <div class="max-w-lg w-full bg-white rounded-3xl p-8 shadow-md border">
         <h1 class="text-2xl font-bold text-center">Sign in</h1>
         <Form
           layout="vertical"

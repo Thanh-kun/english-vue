@@ -1,33 +1,25 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { Button } from 'ant-design-vue'
-import { LogoText, Menu, MenuButton, Menu2 } from '@/components'
-import { useMenuMobile, useMenu } from '@/composables'
+import { LogoText, MenuButton, Menu2 } from '@/components'
+import { useMenuMobile } from '@/composables'
 import { RouterLink } from 'vue-router'
 import { useUser } from '@/stores'
 
 const isUnfold = ref(false)
 
-const handleToggleMenu = () => {
-  isUnfold.value = !isUnfold.value
-}
-
-const handleCloseMenu = () => {
-  isUnfold.value = false
-}
-
-const { menuItems, selectedItems } = useMenu()
 const { menuItems: menuMobileItems, selectedItems: selectedMobileItems } = useMenuMobile()
-const userStore = useUser()
-
-const isAuth = computed(() => {
-  return userStore.isAuth
-})
+const userStore = useUser();
 
 const firstLetter = computed(() => {
   return userStore?.userInfo?.username ? userStore?.userInfo?.username.toString().slice(0, 1) : '';
 })
 
+const handleToggleMenu = () => {
+  isUnfold.value = !isUnfold.value
+}
+const handleCloseMenu = () => {
+  isUnfold.value = false
+}
 </script>
 <template>
   <header class="sticky top-0 z-40">
@@ -39,29 +31,7 @@ const firstLetter = computed(() => {
               <LogoText class="w-full h-full" style="color: #003366" />
             </div>
           </RouterLink>
-          <div class="items-center gap-4 ml-auto hidden lg:flex">
-            <Menu :items="menuItems" :selectedItems="selectedItems" />
-            <div class="flex divide-x border-gray-600" v-if="!isAuth">
-              <div>
-                <RouterLink :to="{ name: 'signIn' }">
-                  <Button type="link">Sign in</Button>
-                </RouterLink>
-              </div>
-              <div>
-                <RouterLink :to="{ name: 'signUp' }">
-                  <Button type="link">Sign up</Button>
-                </RouterLink>
-              </div>
-            </div>
-            <RouterLink to="/" class="no-underline text-black hover:text-gray-800" v-else>
-              <div
-                class="flex-shrink-0 flex items-center justify-center text-white w-10 h-10 bg-primary-300 rounded-full overflow-x-hidden uppercase"
-              >
-              <div v-if="userStore?.userInfo?.username"> {{ firstLetter }} </div>
-              </div>
-            </RouterLink>
-          </div>
-          <div class="ml-auto block lg:hidden">
+          <div class="ml-auto">
             <div
               class="relative p-1 shadow border rounded-lg border-gray-200 cursor-pointer z-50 bg-white"
               @click="handleToggleMenu"
@@ -91,17 +61,17 @@ const firstLetter = computed(() => {
                   <RouterLink to="/" class="no-underline text-black hover:text-gray-800">
                     <div class="flex gap-2 items-center w-full">
                       <div
-                        class="flex-shrink-0 flex items-center justify-center text-white w-12 h-12 bg-primary-300 rounded-full overflow-x-hidden uppercase"
+                        class="flex-shrink-0 flex items-center justify-center text-white w-12 h-12 bg-primary-300 rounded-full overflow-x-hidden"
                       >
-                      <div> {{ firstLetter }} </div>
+                        <span> {{ firstLetter }} </span>
                       </div>
                       <div class="flex-1">
                         <div class="w-full overflow-hidden">
                           <div class="text-sm font-bold overflow-hidden break-all line-clamp-1">
-                            {{ userStore.userInfo.fullname }}
+                            {{ userStore.userInfo?.fullname }}
                           </div>
                           <div class="text-sm font-light overflow-hidden break-all line-clamp-1">
-                            {{ userStore.userInfo.username }}
+                            {{ userStore.userInfo?.username }}
                           </div>
                         </div>
                       </div>

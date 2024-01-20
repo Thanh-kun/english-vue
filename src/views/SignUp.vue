@@ -88,8 +88,8 @@ onMounted(() => {
     style="min-height: calc(100dvh - 60px)"
     class="bg-gradient-to-br from-primary-200 via-primary-50 to-pink-200"
   >
-    <div class="container py-16 h-full flex items-center justify-center">
-      <div class="max-w-lg w-full bg-white rounded-md py-8 px-4">
+    <div class="container mx-auto py-16 h-full flex items-center justify-center">
+      <div class="max-w-lg w-full mx-auto bg-white rounded-3xl p-8">
         <h1 class="text-2xl font-bold text-center">Sign up</h1>
         <Form
           layout="vertical"

@@ -12,13 +12,19 @@ const props = defineProps({
     default: () => []
   }
 })
+const emits = defineEmits(['close']);
 
 const injectSelectedItems = inject('selectedItems2', [])
 const selectedKeys = computed(() => props.selectedItems ?? injectSelectedItems)
+
+const handleClick = (item) => {
+  if(typeof item?.onClick === 'function') item?.onClick();
+  emits('close');
+}
 </script>
 <template>
   <ul>
-    <li v-for="item of items" :key="item.key" @click="item?.onClick">
+    <li v-for="item of items" :key="item.key" @click="() => handleClick(item?.onClick)">
       <component
         :is="
           h(SubItem2, { active: selectedKeys.includes(item.key) }, { default: () => item.label })

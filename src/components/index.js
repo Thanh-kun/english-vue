@@ -1,6 +1,7 @@
 export { default as LogoText } from '@/components/Logo/LogoText.vue'
 export { default as LogoFrame } from '@/components/Logo/LogoFrame.vue'
 export { default as Header } from '@/components/Header/index.vue'
+export { default as LessonHeader } from '@/components/Header/LessonHeader.vue'
 export { default as Menu } from '@/components/Header/Menu.vue'
 export { default as MenuItem } from '@/components/Header/MenuItem.vue'
 export { default as SubMenu } from '@/components/Header/SubMenu.vue'

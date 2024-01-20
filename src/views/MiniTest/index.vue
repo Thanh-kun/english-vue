@@ -1,56 +1,37 @@
+<script setup>
+import PartItem from '@/components/PartItem.vue';
+import { usePart } from '@/stores/part'
+const partStore = usePart()
+</script>
 <template>
   <div style="min-height: calc(100dvh - 60px)" class="bg-primary-50 py-10">
     <div class="w-full container mx-auto">
       <div class="bg-white p-8 rounded-3xl mb-6">
-        <h1 class="text-2xl text-center mb-8">Test</h1>
+        <h1 class="text-2xl text-center mb-8">The TOEIC exam preparation - Mini Test</h1>
         <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          <a
-            href="#"
-            class="shadow border rounded-3xl text-black no-underline group/card bg-white transition-shadow duration-300 hover:text-black hover:shadow-md"
+          <RouterLink
+            v-for="part of partStore.parts"
+            :key="part?.id"
+            :to="{
+              name: 'miniTestPart',
+              params: {
+                partId: part?.id
+              }
+            }"
+            class="block no-underline"
           >
-            <div class="h-48 overflow-hidden rounded-t-3xl">
-              <img
-                src="@/assets/images/image8.webp"
-                class="h-48 w-full object-cover rounded-t-3xl transition-all duration-300 group-hover/card:scale-110"
-                loading="lazy"
-              />
-            </div>
-            <div class="p-4">
-              <h3 class="text-xl font-bold">Mini test</h3>
-              <h4 class="text-lg font-bold mb-2">~30 questions</h4>
-              <p
-                class="line-clamp-4"
-                title="The TOEIC mini test gauges language skills briefly, assessing listening and reading proficiency in workplace scenarios through concise audio and text prompts."
-              >
-                The TOEIC mini test gauges language skills briefly, assessing listening and reading
-                proficiency in workplace scenarios through concise audio and text prompts.
-              </p>
-            </div>
-          </a>
-          <a
-            href="#"
-            class="shadow border rounded-3xl text-black no-underline group/card bg-white transition-shadow duration-300 hover:text-black hover:shadow-md"
-          >
-            <div class="h-48 overflow-hidden rounded-t-3xl">
-              <img
-                src="@/assets/images/image9.webp"
-                class="h-48 w-full object-cover rounded-t-3xl transition-all duration-300 group-hover/card:scale-110"
-                loading="lazy"
-              />
-            </div>
-            <div class="p-4">
-              <h3 class="text-xl font-bold">Full Test</h3>
-              <h4 class="text-lg font-bold mb-2">~100 questions</h4>
-              <p
-                class="line-clamp-4"
-                title="The TOEIC test assesses listening through audio prompts and evaluates reading comprehension via written passages, testing English proficiency for workplace contexts."
-              >
-                The TOEIC test assesses listening through audio prompts and evaluates reading
-                comprehension via written passages, testing English proficiency for workplace
-                contexts.
-              </p>
-            </div>
-          </a>
+            <PartItem :imageUrl="part?.thumbnail">
+              <template #title>
+                {{ part?.sub_name }}
+              </template>
+              <template #subTitle>
+                {{ part?.name }}
+              </template>
+              <template #description>
+                <span :title="part.description">{{ part.description }}</span>
+              </template>
+            </PartItem>
+          </RouterLink>
         </div>
       </div>
       <div class="bg-white p-8 rounded-3xl mb-16 text-justify">

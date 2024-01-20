@@ -6,11 +6,11 @@ const partStore = usePart()
 <template>
   <div style="min-height: calc(100dvh - 60px)" class="bg-primary-50 py-10">
     <div class="w-full container mx-auto">
-      <div class="bg-white py-8 px-8 rounded-3xl mb-8">
+      <div class="bg-white p-8 rounded-3xl mb-6">
         <h1 class="text-2xl text-center mb-8">The TOEIC exam preparation - Reading</h1>
         <Part :parts="partStore.readingParts" />
       </div>
-      <div class="bg-white py-8 px-4 rounded-3xl mb-16 text-justify">
+      <div class="bg-white p-8 rounded-3xl mb-16 text-justify">
         <h2 class="text-xl font-bold mb-4 text-center">Introduction to TOEIC test</h2>
         <h3 class="text-lg font-bold mb-1">Reading</h3>
         <p class="mb-5 indent-8">

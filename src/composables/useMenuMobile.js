@@ -62,12 +62,12 @@ export default function useMenu() {
           key: '/test',
           children: [
             {
-              label: h(RouterLink, { to: '/admin' }, { default: () => 'Mini Test' }),
-              key: '/test/mini-test'
+              label: h(RouterLink, { to: '/mini-test' }, { default: () => 'Mini Test' }),
+              key: '/mini-test'
             },
             {
-              label: h(RouterLink, { to: '/admin' }, { default: () => 'Full Test' }),
-              key: '/test/full-test'
+              label: h(RouterLink, { to: '/full-test' }, { default: () => 'Full Test' }),
+              key: '/full-test'
             }
           ]
         }

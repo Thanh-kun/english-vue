@@ -48,24 +48,53 @@ const router = createRouter({
       component: () => import('@/views/Listening/index.vue')
     },
     {
-      path: '/part/:id',
-      name: 'partItem',
-      component: () => import('@/views/Listening/overview.vue')
-    },
-    {
-      path: '/lesson/:partId/:lessonId',
-      name: 'lessonItem',
-      component: () => import('@/views/Listening/lesson.vue')
-    },
-    {
       path: '/reading',
       name: 'reading',
       component: () => import('@/views/Reading/index.vue')
     },
     {
+      path: '/part/:partId',
+      name: 'part',
+      component: () => import('@/views/Part/index.vue')
+    },
+    {
+      path: '/part/:partId/:testId',
+      name: 'partTest',
+      component: () => import('@/views/Part/test.vue'),
+      meta: {
+        layout: 'LessonLayout',
+      }
+    },
+    {
+      path: '/lesson/:partId/:lessonId',
+      name: 'lesson',
+      component: () => import('@/views/Lesson/id.vue')
+    },
+    {
       path: '/test',
       name: 'test',
       component: () => import('@/views/Test/index.vue')
+    },
+    {
+      path: '/mini-test',
+      name: 'miniTest',
+      component: () => import('@/views/MiniTest/index.vue'),
+    },
+    {
+      path: '/mini-test/:partId',
+      name: 'miniTestPart',
+      component: () => import('@/views/MiniTest/id.vue'),
+      meta: {
+        layout: 'LessonLayout',
+      }
+    },
+    {
+      path: '/full-test',
+      name: 'fullTest',
+      component: () => import('@/views/FullTest.vue'),
+      meta: {
+        layout: 'LessonLayout',
+      }
     },
     {
       path: '/admin',
