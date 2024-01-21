@@ -9,7 +9,7 @@ defineProps({
   >
     <div class="h-48 overflow-hidden rounded-t-3xl">
       <img
-        src="../assets/images/image4.webp"
+        :src="imageUrl"
         class="h-48 w-full object-cover rounded-t-3xl transition-all duration-300 group-hover/card:scale-110"
         loading="lazy"
       />

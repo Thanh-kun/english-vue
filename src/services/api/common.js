@@ -56,6 +56,56 @@ class CommonApi {
     if (partId) url += `&part_id=${partId}`
     return adminHost.get(url, headers)
   }
+  addPart(data, headers) {
+    let url = '/admin/part';
+    let { name, subname, description, thumbnail, type } = data;
+    return adminHost.post(url, { name, sub_name: subname, description, thumbnail, type }, headers)
+  }
+  editPart(data, headers) {
+    let url = '/admin/part/' + data.id;
+    let { name, subname, description, thumbnail, type } = data;
+    return adminHost.post(url, { name, sub_name: subname, description, thumbnail, type }, headers)
+  }
+  addLesson(data, headers) {
+    let url = '/admin/lesson';
+    let { name, content, partId } = data;
+    return adminHost.post(url, { name, content, part_id: partId }, headers)
+  }
+  editLesson(data, headers) {
+    let url = '/admin/lesson/' + data.id;
+    let { name, content, partId } = data;
+    return adminHost.post(url, { name, content, part_id: partId }, headers)
+  }
+  deleteLesson(data, headers) {
+    let url = '/admin/lesson/' + data.id;
+    return adminHost.delete(url, headers)
+  }
+  addQuestion(data, headers) {
+    let url = '/admin/question';
+    let {
+      image,
+      audio,
+      content,
+      name,
+      answers,
+      trueAnswer,
+      type,
+      partId,
+    } = data
+
+    if (name) url += '&name=' + name;
+    if (content) url += '&content=' + content;
+    if (answers) url += '&answers=' + answers;
+    if (type) url += '&type=' + type;
+    if (partId) url += '&part_id=' + partId;
+    if (trueAnswer) url += '&true_answer=' + trueAnswer;
+
+    return adminHost.post(url, { image, audio }, headers)
+  }
+  deleteQuestion(data, headers) {
+    let url = '/admin/question/' + data.id;
+    return adminHost.delete(url, headers)
+  }
 }
 
 const commonApi = new CommonApi()
