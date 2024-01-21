@@ -4,7 +4,9 @@ const DOING = 2
 const END = 3
 
 export const STATUS = {
-  START, DOING, END
+  START,
+  DOING,
+  END
 }
 
 export const LISTENING = 1

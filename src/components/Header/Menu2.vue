@@ -13,10 +13,10 @@ const props = defineProps({
   }
 })
 
-const emits = defineEmits(['close']);
+const emits = defineEmits(['close'])
 
 const handleClose = (e) => {
-  emits('close', e);
+  emits('close', e)
 }
 
 provide('selectedItems2', props.selectedItems)

@@ -62,7 +62,7 @@ const router = createRouter({
       name: 'partTest',
       component: () => import('@/views/Part/test.vue'),
       meta: {
-        layout: 'LessonLayout',
+        layout: 'LessonLayout'
       }
     },
     {
@@ -78,14 +78,14 @@ const router = createRouter({
     {
       path: '/mini-test',
       name: 'miniTest',
-      component: () => import('@/views/MiniTest/index.vue'),
+      component: () => import('@/views/MiniTest/index.vue')
     },
     {
       path: '/mini-test/:partId',
       name: 'miniTestPart',
       component: () => import('@/views/MiniTest/id.vue'),
       meta: {
-        layout: 'LessonLayout',
+        layout: 'LessonLayout'
       }
     },
     {
@@ -93,7 +93,7 @@ const router = createRouter({
       name: 'fullTest',
       component: () => import('@/views/FullTest.vue'),
       meta: {
-        layout: 'LessonLayout',
+        layout: 'LessonLayout'
       }
     },
     {

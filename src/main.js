@@ -17,6 +17,9 @@ const app = createApp(App)
 app.use(pinia)
 app.use(router)
 
-app.component('DefaultLayout', DefaultLayout).component('DashboardLayout', DashboardLayout).component('LessonLayout', LessonLayout)
+app
+  .component('DefaultLayout', DefaultLayout)
+  .component('DashboardLayout', DashboardLayout)
+  .component('LessonLayout', LessonLayout)
 
 app.mount('#app')

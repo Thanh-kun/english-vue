@@ -1,5 +1,5 @@
 <script setup>
-import PartItem from '@/components/PartItem.vue';
+import PartItem from '@/components/PartItem.vue'
 import { usePart } from '@/stores/part'
 const partStore = usePart()
 </script>

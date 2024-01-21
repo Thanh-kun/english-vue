@@ -25,9 +25,8 @@ const isAuth = computed(() => {
 })
 
 const firstLetter = computed(() => {
-  return userStore?.userInfo?.username ? userStore?.userInfo?.username.toString().slice(0, 1) : '';
+  return userStore?.userInfo?.username ? userStore?.userInfo?.username.toString().slice(0, 1) : ''
 })
-
 </script>
 <template>
   <header class="sticky top-0 z-40">
@@ -57,7 +56,7 @@ const firstLetter = computed(() => {
               <div
                 class="flex-shrink-0 flex items-center justify-center text-white w-10 h-10 bg-primary-300 rounded-full overflow-x-hidden uppercase"
               >
-              <div v-if="userStore?.userInfo?.username"> {{ firstLetter }} </div>
+                <div v-if="userStore?.userInfo?.username">{{ firstLetter }}</div>
               </div>
             </RouterLink>
           </div>
@@ -85,7 +84,11 @@ const firstLetter = computed(() => {
                       <LogoText class="h-full w-full" style="color: #003366" />
                     </div>
                   </RouterLink>
-                  <Menu2 :items="menuMobileItems" :selectedItems="selectedMobileItems" @close="handleCloseMenu"/>
+                  <Menu2
+                    :items="menuMobileItems"
+                    :selectedItems="selectedMobileItems"
+                    @close="handleCloseMenu"
+                  />
                 </div>
                 <div class="absolute bottom-4 left-4 right-24" v-if="userStore.userInfo?.username">
                   <RouterLink to="/" class="no-underline text-black hover:text-gray-800">
@@ -93,7 +96,7 @@ const firstLetter = computed(() => {
                       <div
                         class="flex-shrink-0 flex items-center justify-center text-white w-12 h-12 bg-primary-300 rounded-full overflow-x-hidden uppercase"
                       >
-                      <div> {{ firstLetter }} </div>
+                        <div>{{ firstLetter }}</div>
                       </div>
                       <div class="flex-1">
                         <div class="w-full overflow-hidden">

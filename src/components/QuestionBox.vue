@@ -7,7 +7,7 @@
   </div>
   <div class="bg-white rounded-b-3xl rounded-r-3xl border">
     <div class="p-8">
-      <div class="max-h-80 overflow-y-scroll overflow-x-hidden scroll-custom">
+      <div class="max-h-80 overflow-y-scroll overflow-x-hidden scroll-custom py-2">
         <slot name="body" />
       </div>
     </div>

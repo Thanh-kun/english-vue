@@ -8,10 +8,10 @@ import { useUser } from '@/stores'
 const isUnfold = ref(false)
 
 const { menuItems: menuMobileItems, selectedItems: selectedMobileItems } = useMenuMobile()
-const userStore = useUser();
+const userStore = useUser()
 
 const firstLetter = computed(() => {
-  return userStore?.userInfo?.username ? userStore?.userInfo?.username.toString().slice(0, 1) : '';
+  return userStore?.userInfo?.username ? userStore?.userInfo?.username.toString().slice(0, 1) : ''
 })
 
 const handleToggleMenu = () => {
@@ -55,7 +55,11 @@ const handleCloseMenu = () => {
                       <LogoText class="h-full w-full" style="color: #003366" />
                     </div>
                   </RouterLink>
-                  <Menu2 :items="menuMobileItems" :selectedItems="selectedMobileItems" @close="handleCloseMenu"/>
+                  <Menu2
+                    :items="menuMobileItems"
+                    :selectedItems="selectedMobileItems"
+                    @close="handleCloseMenu"
+                  />
                 </div>
                 <div class="absolute bottom-4 left-4 right-24" v-if="userStore.userInfo?.username">
                   <RouterLink to="/" class="no-underline text-black hover:text-gray-800">

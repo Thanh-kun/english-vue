@@ -25,7 +25,8 @@ const emits = defineEmits(['click', 'close'])
 const handleClick = function (e) {
   expansedMenu.value = !expansedMenu.value
   emits('click', e)
-  if(props?.children === null || props?.children === undefined || props?.children?.length <= 0) emits('close', e);
+  if (props?.children === null || props?.children === undefined || props?.children?.length <= 0)
+    emits('close', e)
 }
 
 const handleClose = (e) => {
@@ -63,7 +64,7 @@ watch(
       :class="{ 'max-h-0': !expansedMenu, 'max-h-96': expansedMenu }"
       v-if="children.length > 0"
     >
-      <SubMenu2 :items="children" @close="handleClose"/>
+      <SubMenu2 :items="children" @close="handleClose" />
     </div>
   </div>
 </template>

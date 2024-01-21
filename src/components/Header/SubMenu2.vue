@@ -12,14 +12,14 @@ const props = defineProps({
     default: () => []
   }
 })
-const emits = defineEmits(['close']);
+const emits = defineEmits(['close'])
 
 const injectSelectedItems = inject('selectedItems2', [])
 const selectedKeys = computed(() => props.selectedItems ?? injectSelectedItems)
 
 const handleClick = (item) => {
-  if(typeof item?.onClick === 'function') item?.onClick();
-  emits('close');
+  if (typeof item?.onClick === 'function') item?.onClick()
+  emits('close')
 }
 </script>
 <template>

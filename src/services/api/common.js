@@ -13,10 +13,25 @@ class CommonApi {
     let url = '/test/all/' + partId
     return adminHost.get(url, headers)
   }
+  getTestById(testId, headers) {
+    let url = '/test/' + testId
+    return adminHost.get(url, headers)
+  }
+  getAnswerByIds(ids, headers) {
+    let url = '/question/answers'
+    if (ids.length > 0) {
+      let query = '?'
+      for (let id of ids) {
+        query += 'question_ids=' + id + '&'
+      }
+      url += query.slice(0, query.length - 1)
+    }
+    return adminHost.get(url, headers)
+  }
   getMiniTest(data = {}, headers) {
     const { partId = 1, limit = 50 } = data
     let url = '/exam/mini-test?' + `part_id=${partId}&limit=${limit}`
-    return adminHost.get(url, headers);
+    return adminHost.get(url, headers)
   }
 }
 
