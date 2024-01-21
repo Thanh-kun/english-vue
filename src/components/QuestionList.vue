@@ -10,7 +10,11 @@ const props = defineProps({
   selectedItem: {
     type: [String, Number],
     default: 1
-  }
+  },
+  listAnswer: {
+    type: Object,
+    default: () => {}
+  },
 })
 
 const emits = defineEmits(['change'])
@@ -22,7 +26,7 @@ const handleClick = (item) => {
 <template>
   <div class="flex flex-wrap -mt-2 -mx-1">
     <div class="pt-2 px-1" v-for="item of items" :key="item.value">
-      <QuestionItem :active="item.value === selectedItem" @click="() => handleClick(item)">
+      <QuestionItem :isSelected="listAnswer?.[item.id] >= 1" :active="item.value === selectedItem" @click="() => handleClick(item)">
         {{ item.label }}
       </QuestionItem>
     </div>
