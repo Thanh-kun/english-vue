@@ -97,6 +97,22 @@ const router = createRouter({
       }
     },
     {
+      path: '/user-info',
+      name: 'userInfo',
+      component: () => import('@/views/UserInfo.vue'),
+      meta: {
+        isAuth: true
+      }
+    },
+    {
+      path: '/change-password',
+      name: 'changePassword',
+      component: () => import('@/views/ChangePassword.vue'),
+      meta: {
+        isAuth: true
+      }
+    },
+    {
       path: '/admin',
       name: 'admin',
       component: () => import('@/views/admin/Dashboard.vue'),
