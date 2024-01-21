@@ -1,10 +1,14 @@
 <script setup>
-import { onMounted, reactive } from 'vue'
-import { Form, FormItem, Input, Button } from 'ant-design-vue'
+import { onMounted, reactive, ref } from 'vue'
+import { Form, FormItem, Input, Button, notification } from 'ant-design-vue'
 import Swal from 'sweetalert2'
+import { authApi } from '@/services'
+
 const formData = reactive({
   email: ''
 })
+const formRef = ref(null)
+const loading = ref(false)
 
 const rules = {
   email: [
@@ -16,13 +20,29 @@ const rules = {
   ]
 }
 
-const handleSubmit = () => {
-  console.log('submit', formData)
-  Swal.fire({
-    title: 'The email has been sent!',
-    text: 'Please check your inbox',
-    icon: 'success'
-  })
+const handleSubmit = async () => {
+  try {
+    loading.value = true
+    let data = {
+      email: formData.email
+    }
+    let response = await authApi.formatPassword(data)
+    if (response.data && response.data.success === true && response.data.data) {
+      Swal.fire({
+        title: 'The email has been sent!',
+        text: 'Please check your inbox',
+        icon: 'success'
+      })
+      formRef.value.resetFields()
+    } else throw new Error(response.data?.message)
+  } catch (err) {
+    notification.error({
+      message: 'An error occurred, please try again!',
+      description: err.message
+    })
+  } finally {
+    loading.value = false
+  }
 }
 
 onMounted(() => {
@@ -43,13 +63,14 @@ onMounted(() => {
           autocomplete="off"
           :rules="rules"
           :model="formData"
+          ref="formRef"
           @finish="handleSubmit"
         >
           <FormItem label="Email: " name="email">
             <Input v-model:value="formData.email" autocomplete="email" />
           </FormItem>
           <FormItem>
-            <Button htmlType="submit" block type="primary">Submit</Button>
+            <Button htmlType="submit" block type="primary" :loading="loading">Submit</Button>
           </FormItem>
         </Form>
         <div>

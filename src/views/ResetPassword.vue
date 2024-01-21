@@ -1,11 +1,18 @@
 <script setup>
-import { computed, reactive, onMounted } from 'vue'
-import { Form, FormItem, Input, Button } from 'ant-design-vue'
+import { computed, reactive, onMounted, ref } from 'vue'
+import { Form, FormItem, Input, Button, notification } from 'ant-design-vue'
+import { authApi } from '@/services'
+import { useRoute, useRouter } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
+const accessToken = route.query?.access_token
 
 const formData = reactive({
   password: '',
   confirmPassword: ''
 })
+const loading = ref(false)
 
 const validatePass = async (_rule, value) => {
   if (value === '') {
@@ -20,25 +27,56 @@ const validatePass = async (_rule, value) => {
 const rules = computed(() => ({
   password: [
     {
-      pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+      pattern: /^.{8,}$/,
       message:
         'The password must be at least eight characters long, containing at least one letter and one number'
     },
     { required: true, message: 'Please input your password!' }
   ],
-  confirmPassword: [
-    {
-      pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
-      message:
-        'The password must be at least eight characters long, containing at least one letter and one number'
-    },
-    { validator: validatePass, message: 'The passwords do not match!' }
-  ]
+  confirmPassword: [{ validator: validatePass, message: 'The passwords do not match!' }]
 }))
 
-const handleSubmit = () => {
-  console.log('submit', formData)
+const handleSubmit = async () => {
+  try {
+    loading.value = true
+    let data = {
+      password: formData.password
+    }
+
+    let response = await authApi.resetPassword(data, {
+      headers: { Authorization: 'Bearer ' + accessToken }
+    })
+    if (response.data && response.data.success === true) {
+      notification.success({
+        message: 'Your password has been changed!',
+        description: response.data?.data
+      })
+      router.push('/sign-in')
+    } else throw new Error(response.data?.message)
+  } catch (err) {
+    notification.error({
+      message: 'An error occurred, please try again!',
+      description: err.message
+    })
+  } finally {
+    loading.value = false
+  }
 }
+
+const checkToken = async () => {
+  try {
+    let response = await authApi.checkAuth({ headers: { Authorization: 'Bearer ' + accessToken } })
+    if (response.data && response.data.success === true) {
+      // console.log()
+    } else throw new Error(response.data?.message)
+  } catch (err) {
+    notification.error({
+      message: 'Token has expired'
+    })
+  }
+}
+
+await checkToken()
 
 onMounted(() => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -49,8 +87,8 @@ onMounted(() => {
     style="min-height: calc(100dvh - 60px)"
     class="bg-gradient-to-br from-primary-200 via-primary-50 to-pink-200"
   >
-    <div class="container py-16 h-full flex items-center justify-center">
-      <div class="max-w-lg w-full bg-white rounded-md py-8 px-4">
+    <div class="container mx-auto py-16 h-full flex items-center justify-center">
+      <div class="max-w-lg w-full bg-white rounded-3xl p-8">
         <h1 class="text-2xl font-bold text-center">Reset Password</h1>
         <Form
           layout="vertical"
@@ -71,7 +109,7 @@ onMounted(() => {
             />
           </FormItem>
           <FormItem>
-            <Button htmlType="submit" block type="primary">Submit</Button>
+            <Button htmlType="submit" block type="primary" :loading="loading">Submit</Button>
           </FormItem>
         </Form>
       </div>

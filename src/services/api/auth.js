@@ -11,6 +11,7 @@ class AuthApi {
     let { fullname, birthday, tel } = data
     return adminHost.post(url, { fullname, birthday, tel }, headers)
   }
+
   changePassword(data, headers) {
     let url = '/user/change-password'
     let { oldPassword, newPassword } = data
@@ -19,6 +20,22 @@ class AuthApi {
       { 'old-password': oldPassword, 'new-password': newPassword },
       headers
     )
+  }
+
+  checkAuth(headers) {
+    let url = '/user/check-auth'
+    return adminHost.get(url, headers)
+  }
+
+  resetPassword(data, headers) {
+    let url = '/user/reset-password'
+    let { password } = data
+    return adminHost.post(url, { password: password }, headers)
+  }
+  formatPassword(data, headers) {
+    let url = '/auth/forgot-password'
+    let { email } = data
+    return adminHost.post(url, { username: email }, headers)
   }
 
   signIn(data, headers) {
