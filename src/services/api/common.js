@@ -43,6 +43,19 @@ class CommonApi {
     let url = '/admin/user?' + `page=${page}` + `&size=${size}`;
     return adminHost.get(url, headers)
   }
+  getQuestions(data = {}, headers) {
+    const { page = 1, size = 10, partId, type } = data
+    let url = '/admin/question?' + `page=${page}` + `&size=${size}`;
+    if (partId) url += `&part_id=${partId}`
+    if (type) url += `&type=${type}`
+    return adminHost.get(url, headers)
+  }
+  getTests(data = {}, headers) {
+    const { page = 1, size = 10, partId } = data
+    let url = '/admin/test?' + `page=${page}` + `&size=${size}`;
+    if (partId) url += `&part_id=${partId}`
+    return adminHost.get(url, headers)
+  }
 }
 
 const commonApi = new CommonApi()

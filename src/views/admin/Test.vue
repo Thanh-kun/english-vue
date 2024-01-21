@@ -4,19 +4,23 @@ import { Table, notification, Select, Button } from 'ant-design-vue'
 import { computed, reactive, ref } from 'vue'
 
 const parts = ref([])
-const lessons = ref([])
+const questions = ref([])
 const pageSize = ref(10)
 const current = ref(1)
 const total = ref(0)
 const partsLoading = ref(false)
-const lessonsLoading = ref(false)
+const questionsLoading = ref(false)
 
 const searchFormData = reactive({
-  partId: undefined
+  partId: ''
 })
 
 const partOptions = computed(() => {
-  return parts.value.map((item) => ({ value: item.id, label: item.sub_name + ' :' + item.name }))
+  let options = [{ value: '', label: 'All' }]
+  return [
+    ...options,
+    ...parts.value.map((item) => ({ value: item.id, label: item.sub_name + ' :' + item.name }))
+  ]
 })
 
 const pagination = computed(() => {
@@ -30,24 +34,24 @@ const pagination = computed(() => {
 
 const columns = [
   {
+    title: 'Id',
+    dataIndex: 'id',
+    key: 'id'
+  },
+  {
     title: 'Name',
     dataIndex: 'name',
     key: 'name'
   },
   {
-    title: 'Content',
-    dataIndex: 'content',
-    key: 'content'
+    title: 'Participant',
+    dataIndex: 'participant',
+    key: 'participant'
   },
   {
-    title: 'Part_id',
+    title: 'Part Id',
     dataIndex: 'part_id',
     key: 'part_id'
-  },
-  {
-    title: 'Created at',
-    dataIndex: 'created_at',
-    key: 'created_at'
   }
 ]
 
@@ -57,7 +61,7 @@ const getParts = async () => {
     let response = await commonApi.getPart()
     if (response.data && response.data.success === true && response.data.data) {
       parts.value = response.data?.data ?? []
-      searchFormData.partId = parts.value.length > 0 ? parts.value[0].id : undefined
+      total.value = parts.value.length
     } else throw new Error(response.data?.message)
   } catch (err) {
     notification.error({
@@ -68,15 +72,20 @@ const getParts = async () => {
     partsLoading.value = false
   }
 }
-await getParts()
+getParts()
 
-const getLessons = async () => {
+const getQuestions = async () => {
   try {
-    lessonsLoading.value = true
-    let response = await commonApi.getLesson(searchFormData.partId)
+    questionsLoading.value = true
+    let data = {
+      page: current.value,
+      size: pageSize.value,
+      partId: searchFormData.partId
+    }
+    let response = await commonApi.getTests(data)
     if (response.data && response.data.success === true && response.data.data) {
-      lessons.value = response.data?.data ?? []
-      total.value = lessons.value.length
+      questions.value = response.data?.data?.content ?? []
+      total.value = response.data?.data?.totalElements ?? 0
     } else throw new Error(response.data?.message)
   } catch (err) {
     notification.error({
@@ -84,23 +93,23 @@ const getLessons = async () => {
       description: err.message
     })
   } finally {
-    lessonsLoading.value = false
+    questionsLoading.value = false
   }
 }
-getLessons()
+getQuestions()
 
 const handleChange = async (page) => {
   pageSize.value = page.pageSize
   current.value = page.current
+  await getQuestions()
 }
-
 const partIdToText = (partId) => {
   return partOptions.value.find((item) => item.value === partId)?.label
 }
 </script>
 <template>
   <div>
-    <h1 class="mb-8">Lessons</h1>
+    <h1 class="mb-8">Questions</h1>
     <div class="flex gap-4 lg:flex-row flex-col mb-8">
       <Select
         :options="partOptions"
@@ -110,33 +119,18 @@ const partIdToText = (partId) => {
         :loading="partsLoading"
       >
       </Select>
-      <Button type="primary" :loading="lessonsLoading" @click="getLessons">Search</Button>
+      <Button type="primary" :loading="questionsLoading" @click="getQuestions">Search</Button>
     </div>
     <div>
       <Table
-        :dataSource="lessons"
+        :dataSource="questions"
         :columns="columns"
         :pagination="pagination"
         @change="handleChange"
-        :loading="lessonsLoading"
+        :loading="questionsLoading"
         bordered
       >
         <template #bodyCell="{ text, column }">
-          <template v-if="column.key === 'name'">
-            <div class="line-clamp-3" :title="text">
-              {{ text }}
-            </div>
-          </template>
-          <template v-if="column.key === 'content'">
-            <div class="line-clamp-3" :title="text">
-              {{ text }}
-            </div>
-          </template>
-          <template v-if="column.key === 'created_at'">
-            <div class="line-clamp-3" :title="text">
-              {{ text }}
-            </div>
-          </template>
           <template v-if="column.key === 'part_id'">
             <span class="line-clamp-3" :title="partIdToText(text)">{{ partIdToText(text) }}</span>
           </template>

@@ -5,8 +5,9 @@ import {
   ContainerOutlined,
   FileTextOutlined,
   QuestionCircleOutlined,
-  AppstoreOutlined,
-  LoginOutlined
+  // AppstoreOutlined,
+  LoginOutlined,
+  FileDoneOutlined
 } from '@ant-design/icons-vue'
 import { useTheme } from '@/stores/theme'
 
@@ -15,11 +16,11 @@ export default function useSidebar() {
   const themeStore = useTheme()
 
   const menuItems = [
-    {
-      label: h(RouterLink, { to: '/admin' }, { default: () => 'Dashboard' }),
-      key: '/admin',
-      icon: h(AppstoreOutlined)
-    },
+    // {
+    //   label: h(RouterLink, { to: '/admin' }, { default: () => 'Dashboard' }),
+    //   key: '/admin',
+    //   icon: h(AppstoreOutlined)
+    // },
     {
       label: h(RouterLink, { to: '/admin/user' }, { default: () => 'User' }),
       key: '/admin/user',
@@ -39,6 +40,11 @@ export default function useSidebar() {
       label: h(RouterLink, { to: '/admin/question' }, { default: () => 'Question' }),
       key: '/admin/question',
       icon: h(QuestionCircleOutlined)
+    },
+    {
+      label: h(RouterLink, { to: '/admin/test' }, { default: () => 'Test' }),
+      key: '/admin/test',
+      icon: h(FileDoneOutlined)
     },
     {
       label: 'Log out',

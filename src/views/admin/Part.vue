@@ -63,12 +63,11 @@ const getParts = async () => {
     loading.value = false
   }
 }
-await getParts()
+getParts()
 
 const handleChange = async (page) => {
   pageSize.value = page.pageSize
   current.value = page.current
-  // await getParts();
 }
 </script>
 <template>
@@ -93,6 +92,10 @@ const handleChange = async (page) => {
             <a target="_blank" :href="text" class="line-clamp-3" :title="text">
               {{ text }}
             </a>
+          </template>
+          <template v-if="column.key === 'type'">
+            <span v-if="text === 1">Listening</span>
+            <span v-if="text === 2">Reading</span>
           </template>
         </template>
       </Table>

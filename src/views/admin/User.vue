@@ -67,7 +67,7 @@ const getUsers = async () => {
     loading.value = false
   }
 }
-await getUsers()
+getUsers()
 
 const handleChange = async (page) => {
   pageSize.value = page.pageSize

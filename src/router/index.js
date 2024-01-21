@@ -112,15 +112,15 @@ const router = createRouter({
         isAuth: true
       }
     },
-    {
-      path: '/admin',
-      name: 'admin',
-      component: () => import('@/views/admin/Dashboard.vue'),
-      meta: {
-        layout: 'DashboardLayout',
-        isAdmin: true
-      }
-    },
+    // {
+    //   path: '/admin',
+    //   name: 'admin',
+    //   component: () => import('@/views/admin/Dashboard.vue'),
+    //   meta: {
+    //     layout: 'DashboardLayout',
+    //     isAdmin: true
+    //   }
+    // },
     {
       path: '/admin/user',
       name: 'adminUser',
@@ -129,6 +129,10 @@ const router = createRouter({
         layout: 'DashboardLayout',
         isAdmin: true
       }
+    },
+    {
+      path: '/admin',
+      redirect: '/admin/user'
     },
     {
       path: '/admin/part',
@@ -152,6 +156,15 @@ const router = createRouter({
       path: '/admin/question',
       name: 'adminQuestion',
       component: () => import('@/views/admin/Question/Search.vue'),
+      meta: {
+        layout: 'DashboardLayout',
+        isAdmin: true
+      }
+    },
+    {
+      path: '/admin/test',
+      name: 'adminTest',
+      component: () => import('@/views/admin/Test.vue'),
       meta: {
         layout: 'DashboardLayout',
         isAdmin: true
