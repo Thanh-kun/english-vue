@@ -1,10 +1,16 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { Button } from 'ant-design-vue'
+import { Button, Modal } from 'ant-design-vue'
 import { LogoText, Menu, MenuButton, Menu2 } from '@/components'
 import { useMenuMobile, useMenu } from '@/composables'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { useUser } from '@/stores'
+import {
+  UserIcon,
+  ArrowLeftStartOnRectangleIcon,
+  Cog6ToothIcon,
+  KeyIcon
+} from '@heroicons/vue/24/outline'
 
 const isUnfold = ref(false)
 
@@ -19,14 +25,30 @@ const handleCloseMenu = () => {
 const { menuItems, selectedItems } = useMenu()
 const { menuItems: menuMobileItems, selectedItems: selectedMobileItems } = useMenuMobile()
 const userStore = useUser()
+const router = useRouter()
 
 const isAuth = computed(() => {
   return userStore.isAuth
 })
 
+const isAdmin = computed(() => {
+  return userStore.userInfo?.role === 'admin'
+})
+
 const firstLetter = computed(() => {
   return userStore?.userInfo?.username ? userStore?.userInfo?.username.toString().slice(0, 1) : ''
 })
+
+const handleLgout = () => {
+  Modal.confirm({
+    title: 'Do you want to log out?',
+    onOk: () => {
+      console.log('enter')
+      userStore.clearToken()
+      router.push('/sign-in')
+    }
+  })
+}
 </script>
 <template>
   <header class="sticky top-0 z-40">
@@ -52,13 +74,65 @@ const firstLetter = computed(() => {
                 </RouterLink>
               </div>
             </div>
-            <RouterLink to="/" class="no-underline text-black hover:text-gray-800" v-else>
+            <div class="relative group/avatar no-underline text-black hover:text-gray-800" v-else>
               <div
-                class="flex-shrink-0 flex items-center justify-center text-white w-10 h-10 bg-primary-300 rounded-full overflow-x-hidden uppercase"
+                class="flex-shrink-0 flex items-center justify-center text-white w-10 h-10 bg-primary-300 rounded-full overflow-x-hidden uppercase cursor-pointer"
               >
                 <div v-if="userStore?.userInfo?.username">{{ firstLetter }}</div>
               </div>
-            </RouterLink>
+              <div
+                class="absolute top-full right-0 transition-all group-hover/avatar:visible group-hover/avatar:opacity-100 invisible opacity-0"
+              >
+                <div class="pt-4">
+                  <ul class="bg-white rounded border py-2 px-3">
+                    <li class="min-w-36" v-if="isAdmin">
+                      <div>
+                        <RouterLink
+                          to="/admin"
+                          class="relative flex items-center p-2 rounded-md overflow-hidden text-gray-800 hover:bg-primary-400 hover:text-white text-ellipsis cursor-pointer whitespace-nowrap no-underline"
+                        >
+                          <Cog6ToothIcon class="w-4 h-4 flex-shrink-0 mr-2" />
+                          <div>Admin</div>
+                        </RouterLink>
+                      </div>
+                    </li>
+                    <li class="min-w-36">
+                      <div>
+                        <RouterLink
+                          to="/user-info"
+                          class="relative flex items-center p-2 rounded-md overflow-hidden text-gray-800 hover:bg-primary-400 hover:text-white text-ellipsis cursor-pointer whitespace-nowrap no-underline"
+                        >
+                          <UserIcon class="w-4 h-4 flex-shrink-0 mr-2" />
+                          <div>User Info</div>
+                        </RouterLink>
+                      </div>
+                    </li>
+                    <li class="min-w-36">
+                      <div>
+                        <RouterLink
+                          to="/change-password"
+                          class="relative flex items-center p-2 rounded-md overflow-hidden text-gray-800 hover:bg-primary-400 hover:text-white text-ellipsis cursor-pointer whitespace-nowrap no-underline"
+                        >
+                          <KeyIcon class="w-4 h-4 flex-shrink-0 mr-2" />
+                          <div>Change Password</div>
+                        </RouterLink>
+                      </div>
+                    </li>
+                    <li class="min-w-36">
+                      <div>
+                        <div
+                          class="relative flex items-center p-2 rounded-md overflow-hidden text-gray-800 hover:bg-primary-400 hover:text-white text-ellipsis cursor-pointer whitespace-nowrap no-underline"
+                          @click="handleLgout"
+                        >
+                          <ArrowLeftStartOnRectangleIcon class="w-4 h-4 flex-shrink-0 mr-2" />
+                          <div>Log out</div>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="ml-auto block lg:hidden">
             <div
