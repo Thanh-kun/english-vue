@@ -38,6 +38,11 @@ class CommonApi {
     let url = '/exam/full-test?' + `limit=${limit}`
     return adminHost.get(url, headers)
   }
+  getUsers(data = {}, headers) {
+    const { page = 1, size = 10 } = data
+    let url = '/admin/user?' + `page=${page}` + `&size=${size}`;
+    return adminHost.get(url, headers)
+  }
 }
 
 const commonApi = new CommonApi()

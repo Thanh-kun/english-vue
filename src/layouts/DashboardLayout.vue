@@ -18,9 +18,11 @@ const { menuItems, selectedKeys, collapsed, toggleMenu } = useSidebar()
         @collapse="toggleMenu"
       >
         <div class="pt-8 pb-10 px-2">
-          <div class="h-12 w-full rounded-md overflow-hidden">
-            <LogoText class="w-full" style="color: #003366" />
-          </div>
+          <RouterLink to="/">
+            <div class="h-12 w-full rounded-md overflow-hidden">
+              <LogoText class="w-full" style="color: #003366" />
+            </div>
+          </RouterLink>
         </div>
         <Menu
           :selectedKeys="selectedKeys"
