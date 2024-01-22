@@ -162,6 +162,15 @@ const router = createRouter({
       }
     },
     {
+      path: '/admin/question/add',
+      name: 'adminQuestionAdd',
+      component: () => import('@/views/admin/Question/add.vue'),
+      meta: {
+        layout: 'DashboardLayout',
+        isAdmin: true
+      }
+    },
+    {
       path: '/admin/test',
       name: 'adminTest',
       component: () => import('@/views/admin/Test.vue'),

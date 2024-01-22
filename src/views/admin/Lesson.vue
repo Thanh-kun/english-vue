@@ -69,7 +69,8 @@ const columns = [
   },
   {
     title: 'Action',
-    key: 'action'
+    key: 'action',
+    width: '144px'
   }
 ]
 

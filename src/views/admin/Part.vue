@@ -68,7 +68,8 @@ const columns = [
   {
     title: 'Action',
     dataIndex: 'action',
-    key: 'action'
+    key: 'action',
+    width: '88px'
   }
 ]
 

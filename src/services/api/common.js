@@ -98,14 +98,17 @@ class CommonApi {
       partId,
     } = data
 
-    if (name) url += '&name=' + name;
+    if (name) url += '?name=' + name;
     if (content) url += '&content=' + content;
     if (answers) url += '&answers=' + answers;
     if (type) url += '&type=' + type;
     if (partId) url += '&part_id=' + partId;
     if (trueAnswer) url += '&true_answer=' + trueAnswer;
 
-    return adminHost.post(url, { image, audio }, headers)
+    var formData = new FormData();
+    formData.append('image', image);
+    formData.append('audio', audio);
+    return adminHost.post(url, formData, { ...headers, 'Content-Type': 'multipart/form-data' })
   }
   deleteQuestion(data, headers) {
     let url = '/admin/question/' + data.id;
