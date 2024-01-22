@@ -89,7 +89,10 @@ if (!(partId in testStore.tests)) {
                   <div
                     class="text-3xl text-center font-black text-gray-400 py-6 border-b border-dashed border-gray-300"
                   >
-                    0%
+                    <span v-if="correct === null || correct === undefined" class="text-green-300"
+                      >{{ Math.round((test.correct / (test.failed + test.correct)) * 100) }}%</span
+                    >
+                    <span v-else>0%</span>
                   </div>
                   <div class="pb-6 pt-4">
                     <div

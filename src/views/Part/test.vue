@@ -1,7 +1,7 @@
 <script setup>
 import QuestionList from '@/components/QuestionList.vue'
 import QuestionBox from '@/components/QuestionBox.vue'
-import { Button, Radio, RadioGroup, Image } from 'ant-design-vue'
+import { Button, Radio, RadioGroup, Image, notification } from 'ant-design-vue'
 import { computed, ref, watch } from 'vue'
 import { commonApi } from '@/services/index'
 import { STATUS } from '@/constant/index'
@@ -24,7 +24,6 @@ const isShowAnswer = ref(false)
 
 const currentQuestionIndex = ref(0)
 const currentQuestion = computed(() => {
-  console.log(questions.value[currentQuestionIndex.value])
   return questions.value[currentQuestionIndex.value] ?? {}
 })
 const questionOptions = computed(() => {
@@ -115,15 +114,41 @@ const handleStarted = () => {
 const handleReset = () => {
   currentQuestionIndex.value = 0
   currentChooseAnswer.value = undefined
+  chooseAnswers.value = {}
   correctQuestion.value = 0
   incorrectQuestion.value = 0
+  isShowAnswer.value = false
 
   testStatus.value = STATUS.START
 }
 
-const handleNext = () => {
+const handleNext = async () => {
   if (currentQuestionIndex.value >= questionOptions.value.length - 1) {
     testStatus.value = STATUS.END
+    try {
+      let data = {
+        testId: Number(testId),
+        correct: correctQuestion.value
+      }
+      let response = await commonApi.submitTest(data)
+      if (response.data && response.data.success === true) {
+        // Success
+      } else throw new Error(response.data?.message)
+
+      try {
+        let response = await commonApi.getTest(partId)
+        if (response.status === 200 && response.data.success === true) {
+          testStore.setTests(response.data.data ?? [], partId)
+        } else throw new Error()
+      } catch (err) {
+        console.log(err?.message)
+      }
+    } catch (err) {
+      notification.error({
+        message: 'An error occurred, please try again!',
+        description: err.message
+      })
+    }
   } else {
     currentQuestionIndex.value += 1
     currentChooseAnswer.value = chooseAnswers.value[currentQuestionIndex.value]?.answerId
@@ -210,13 +235,23 @@ if (!(partId in testStore.tests)) {
                     :key="answer.id"
                     class="block mb-2"
                   >
-                    <Radio :value="answer.id">{{ answer.content }}</Radio>
+                    <Radio
+                      :value="answer.id"
+                      :class="{
+                        'bg-green-100': isShowAnswer && currentAnswer.id === answer.id,
+                        'bg-red-100':
+                          isShowAnswer &&
+                          currentChooseAnswer !== currentAnswer.id &&
+                          currentChooseAnswer === answer.id
+                      }"
+                      >{{ answer.content }}</Radio
+                    >
                   </div>
                 </RadioGroup>
               </div>
-              <div v-if="isShowAnswer">
+              <!-- <div v-if="isShowAnswer">
                 <div class="text-green-600">{{ currentAnswer.content }}</div>
-              </div>
+              </div> -->
               <div class="flex justify-between mt-8">
                 <Button @click="handlePrev" disabled>Prev</Button>
                 <Button
@@ -224,8 +259,12 @@ if (!(partId in testStore.tests)) {
                   @click="handleNext"
                   :loading="isAnswersLoading && currentChooseAnswer !== undefined"
                   :disabled="currentChooseAnswer === undefined || isAnswersLoading"
-                  >Next</Button
                 >
+                  <span v-if="questions.length > 0 && currentQuestionIndex >= questions.length - 1">
+                    Submit
+                  </span>
+                  <span v-else> Next </span>
+                </Button>
               </div>
             </div>
             <div v-if="testStatus === STATUS.END">
@@ -239,17 +278,27 @@ if (!(partId in testStore.tests)) {
                   Incorrect: {{ incorrectQuestion }} / {{ questions.length }}
                 </div>
               </div>
-              <div class="text-center my-8">
+              <div class="text-center my-4">
                 <Button class="min-w-40" @click="handleReset">Reset</Button>
+              </div>
+              <div class="text-center my-4">
+                <RouterLink :to="`/part/${partId}`">
+                  <Button class="min-w-40" type="primary">Back</Button>
+                </RouterLink>
               </div>
             </div>
           </div>
         </div>
-        <div class="pt-3 px-3 w-full lg:w-[318px] xl:w-[362px]">
+        <div class="pt-3 px-3 w-full lg:w-[318px] xl:w-[362px]" v-if="testStatus == STATUS.DOING">
           <QuestionBox>
             <template #header> {{ testItem.name }} </template>
             <template #body>
-              <QuestionList :items="questionOptions" :selectedItem="currentQuestion.id" />
+              <QuestionList
+                :listAnswer="chooseAnswers"
+                :items="questionOptions"
+                :selectedItem="currentQuestion.id"
+                noneSelected
+              />
             </template>
             <template #footer>
               <div class="flex items-start justify-between">

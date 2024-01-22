@@ -15,18 +15,28 @@ const props = defineProps({
     type: Object,
     default: () => {}
   },
+  noneSelected: {
+    type: Boolean,
+    default: false
+  }
 })
 
-const emits = defineEmits(['change'])
+const emits = defineEmits(['change', 'select'])
 
 const handleClick = (item) => {
   emits('change', item.value)
+  emits('select', item.value)
 }
 </script>
 <template>
   <div class="flex flex-wrap -mt-2 -mx-1">
     <div class="pt-2 px-1" v-for="item of items" :key="item.value">
-      <QuestionItem :isSelected="listAnswer?.[item.id] >= 1" :active="item.value === selectedItem" @click="() => handleClick(item)">
+      <QuestionItem
+        :isSelected="listAnswer?.[item.id] >= 1"
+        :active="item.value === selectedItem"
+        @click="() => handleClick(item)"
+        :noneSelected="noneSelected"
+      >
         {{ item.label }}
       </QuestionItem>
     </div>

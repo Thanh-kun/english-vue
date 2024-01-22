@@ -56,6 +56,11 @@ class CommonApi {
     if (partId) url += `&part_id=${partId}`
     return adminHost.get(url, headers)
   }
+  submitTest(data = {}, headers) {
+    const { testId, correct = 0 } = data
+    let url = '/test/submit';
+    return adminHost.post(url, { test_id: testId, correct }, headers)
+  }
   addPart(data, headers) {
     let url = '/admin/part';
     let { name, subname, description, thumbnail, type } = data;

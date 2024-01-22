@@ -1,11 +1,14 @@
+<script setup>
+import { RouterLink } from 'vue-router'
+</script>
 <template>
   <div style="min-height: calc(100dvh - 60px)" class="bg-primary-50 py-10">
     <div class="w-full container mx-auto">
       <div class="bg-white p-8 rounded-3xl mb-6">
         <h1 class="text-2xl text-center mb-8">Test</h1>
         <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          <a
-            href="#"
+          <RouterLink
+            to="/mini-test"
             class="shadow border rounded-3xl text-black no-underline group/card bg-white transition-shadow duration-300 hover:text-black hover:shadow-md"
           >
             <div class="h-48 overflow-hidden rounded-t-3xl">
@@ -26,9 +29,9 @@
                 proficiency in workplace scenarios through concise audio and text prompts.
               </p>
             </div>
-          </a>
-          <a
-            href="#"
+          </RouterLink>
+          <RouterLink
+            to="/full-test"
             class="shadow border rounded-3xl text-black no-underline group/card bg-white transition-shadow duration-300 hover:text-black hover:shadow-md"
           >
             <div class="h-48 overflow-hidden rounded-t-3xl">
@@ -50,7 +53,7 @@
                 contexts.
               </p>
             </div>
-          </a>
+          </RouterLink>
         </div>
       </div>
       <div class="bg-white p-8 rounded-3xl mb-16 text-justify">

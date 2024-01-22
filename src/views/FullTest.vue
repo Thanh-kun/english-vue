@@ -5,7 +5,6 @@ import { Button, Radio, RadioGroup, Image } from 'ant-design-vue'
 import { computed, ref } from 'vue'
 import { commonApi } from '@/services/index'
 import { STATUS } from '@/constant/index'
-import { sleep } from '@/utils/index'
 
 const questions = ref([])
 const dataLoading = ref(false)
@@ -41,7 +40,6 @@ const getTestData = async () => {
   try {
     dataLoading.value = true
     let response = await commonApi.getFullTest({ limit: 100 })
-    await sleep(2000)
     if (response.status === 200 && response.data.success === true) {
       questions.value = response.data?.data ?? []
     }
@@ -237,10 +235,12 @@ const handleChangeAnswer = (e) => {
               />
             </template>
             <template #footer>
-              <div div class="font-bold text-sm text-start">
-                <button @click="handleSubmit">Submit</button>
+              <div class="flex items-center justify-between">
+                <div class="font-bold text-sm text-end">{{ questionItems.length }} questions</div>
+                <div div class="font-bold text-sm text-start">
+                  <Button @click="handleSubmit" type="primary">Submit</Button>
+                </div>
               </div>
-              <div class="font-bold text-sm text-end">{{ questionItems.length }} questions</div>
             </template>
           </QuestionBox>
         </div>

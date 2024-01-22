@@ -2,7 +2,11 @@
 // eslint-disable-next-line no-unused-vars
 const props = defineProps({
   active: Boolean,
-  isSelected: Boolean
+  isSelected: Boolean,
+  noneSelected: {
+    type: Boolean,
+    default: false
+  }
 })
 </script>
 <template>
@@ -12,6 +16,8 @@ const props = defineProps({
       'border-primary-500 bg-primary-500 ring-1 ring-primary-300': active,
       'border-gray-300 bg-primary-100': !active,
       'border-primary-400 bg-primary-300 ring-1 ring-primary-200': isSelected && !active,
+      'cursor-pointer': !noneSelected,
+      'cursor-not-allowed': noneSelected
     }"
   >
     <slot />
