@@ -40,10 +40,10 @@ const { menuItems, selectedKeys, collapsed, toggleMenu } = useSidebar()
       <LayoutContent>
         <div class="min-h-screen bg-primary-50 bg-opacity-80 px-4 py-2">
           <div
-            class="bg-white py-4 pl-4 rounded-md shadow scroll-custom scroll-custom--hover overflow-y-scroll"
+            class="bg-white py-4 pl-4 rounded-md shadow scroll-custom scroll-custom--hover overflow-y-scroll px-2"
             style="height: calc(100vh - 16px)"
           >
-            <div class="min-h-[200vh]">
+            <div>
               <slot />
             </div>
           </div>

@@ -18,7 +18,7 @@ const searchFormData = reactive({
 })
 
 const partOptions = computed(() => {
-  let options = [{ value: '', label: 'All' }]
+  let options = [{ value: '', label: 'All Parts' }]
   return [
     ...options,
     ...parts.value.map((item) => ({ value: item.id, label: item.sub_name + ' :' + item.name }))
@@ -43,7 +43,7 @@ const questionTypes = [
 const questionTypeOptions = ref([
   {
     value: '',
-    label: 'All'
+    label: 'All Question Types'
   },
   ...questionTypes
 ])

@@ -169,7 +169,7 @@ const handleSubmitFormInModal = async () => {
       response = await commonApi.editLesson(data)
       if (response.data && response.data.success === true) {
         notification.success({
-          message: 'Updated added'
+          message: 'Updated lesson'
         })
         await getLessons()
         visibleModal.value = false

@@ -39,79 +39,89 @@ class CommonApi {
     return adminHost.get(url, headers)
   }
   getUsers(data = {}, headers) {
-    const { page = 1, size = 10 } = data
-    let url = '/admin/user?' + `page=${page}` + `&size=${size}`;
+    const { page = 1, size = 10, username = '', fullname = '' } = data
+    let url =
+      '/admin/user?' +
+      `page=${page}` +
+      `&size=${size}` +
+      `&username=${username}` +
+      `&fullname=${fullname}`
     return adminHost.get(url, headers)
   }
   getQuestions(data = {}, headers) {
     const { page = 1, size = 10, partId, type } = data
-    let url = '/admin/question?' + `page=${page}` + `&size=${size}`;
+    let url = '/admin/question?' + `page=${page}` + `&size=${size}`
     if (partId) url += `&part_id=${partId}`
     if (type) url += `&type=${type}`
     return adminHost.get(url, headers)
   }
   getTests(data = {}, headers) {
     const { page = 1, size = 10, partId } = data
-    let url = '/admin/test?' + `page=${page}` + `&size=${size}`;
+    let url = '/admin/test?' + `page=${page}` + `&size=${size}`
     if (partId) url += `&part_id=${partId}`
     return adminHost.get(url, headers)
   }
   submitTest(data = {}, headers) {
     const { testId, correct = 0 } = data
-    let url = '/test/submit';
+    let url = '/test/submit'
     return adminHost.post(url, { test_id: testId, correct }, headers)
   }
   addPart(data, headers) {
-    let url = '/admin/part';
-    let { name, subname, description, thumbnail, type } = data;
+    let url = '/admin/part'
+    let { name, subname, description, thumbnail, type } = data
     return adminHost.post(url, { name, sub_name: subname, description, thumbnail, type }, headers)
   }
   editPart(data, headers) {
-    let url = '/admin/part/' + data.id;
-    let { name, subname, description, thumbnail, type } = data;
+    let url = '/admin/part/' + data.id
+    let { name, subname, description, thumbnail, type } = data
     return adminHost.post(url, { name, sub_name: subname, description, thumbnail, type }, headers)
   }
   addLesson(data, headers) {
-    let url = '/admin/lesson';
-    let { name, content, partId } = data;
+    let url = '/admin/lesson'
+    let { name, content, partId } = data
     return adminHost.post(url, { name, content, part_id: partId }, headers)
   }
   editLesson(data, headers) {
-    let url = '/admin/lesson/' + data.id;
-    let { name, content, partId } = data;
+    let url = '/admin/lesson/' + data.id
+    let { name, content, partId } = data
     return adminHost.post(url, { name, content, part_id: partId }, headers)
   }
   deleteLesson(data, headers) {
-    let url = '/admin/lesson/' + data.id;
+    let url = '/admin/lesson/' + data.id
     return adminHost.delete(url, headers)
   }
   addQuestion(data, headers) {
-    let url = '/admin/question';
-    let {
-      image,
-      audio,
-      content,
-      name,
-      answers,
-      trueAnswer,
-      type,
-      partId,
-    } = data
+    let url = '/admin/question'
+    let { image, audio, content, name, answers, trueAnswer, type, partId } = data
 
-    if (name) url += '?name=' + name;
-    if (content) url += '&content=' + content;
-    if (answers) url += '&answers=' + answers;
-    if (type) url += '&type=' + type;
-    if (partId) url += '&part_id=' + partId;
-    if (trueAnswer) url += '&true_answer=' + trueAnswer;
+    if (name) url += '?name=' + name
+    if (content) url += '&content=' + content
+    if (answers) url += '&answers=' + answers
+    if (type) url += '&type=' + type
+    if (partId) url += '&part_id=' + partId
+    if (trueAnswer) url += '&true_answer=' + trueAnswer
 
-    var formData = new FormData();
-    formData.append('image', image);
-    formData.append('audio', audio);
+    var formData = new FormData()
+    formData.append('image', image)
+    formData.append('audio', audio)
     return adminHost.post(url, formData, { ...headers, 'Content-Type': 'multipart/form-data' })
   }
   deleteQuestion(data, headers) {
-    let url = '/admin/question/' + data.id;
+    let url = '/admin/question/' + data.id
+    return adminHost.delete(url, headers)
+  }
+  addTest(data, headers) {
+    let url = '/admin/test'
+    let { name, partId } = data
+    return adminHost.post(url, { name, part_id: partId }, headers)
+  }
+  editTest(data, headers) {
+    let url = '/admin/test/' + data.id
+    let { name, partId } = data
+    return adminHost.post(url, { name, part_id: partId }, headers)
+  }
+  deleteTest(data, headers) {
+    let url = '/admin/test/' + data.id
     return adminHost.delete(url, headers)
   }
 }

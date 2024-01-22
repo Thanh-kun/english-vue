@@ -161,7 +161,7 @@ const handleSubmitFormInModal = async () => {
       response = await commonApi.editPart(data)
       if (response.data && response.data.success === true) {
         notification.success({
-          message: 'Updated added'
+          message: 'Updated part'
         })
         await getParts()
         visibleModal.value = false
