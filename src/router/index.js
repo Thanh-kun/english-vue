@@ -144,6 +144,15 @@ const router = createRouter({
       }
     },
     {
+      path: '/admin/test-question',
+      name: 'adminTestQuestion',
+      component: () => import('@/views/admin/TestQuestion.vue'),
+      meta: {
+        layout: 'DashboardLayout',
+        isAdmin: true
+      }
+    },
+    {
       path: '/admin/lesson',
       name: 'adminLesson',
       component: () => import('@/views/admin/Lesson.vue'),

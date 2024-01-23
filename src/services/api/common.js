@@ -94,14 +94,15 @@ class CommonApi {
     let url = '/admin/question'
     let { image, audio, content, name, answers, trueAnswer, type, partId } = data
 
-    if (name) url += '?name=' + name
-    if (content) url += '&content=' + content
-    if (answers) url += '&answers=' + answers
-    if (type) url += '&type=' + type
-    if (partId) url += '&part_id=' + partId
-    if (trueAnswer) url += '&true_answer=' + trueAnswer
-
     var formData = new FormData()
+
+    console.log(name, content, answers)
+    formData.append('name', name);
+    formData.append('content', content);
+    formData.append('answers', answers);
+    formData.append('type', type);
+    formData.append('part_id', partId);
+    formData.append('true_answer', trueAnswer);
     formData.append('image', image)
     formData.append('audio', audio)
     return adminHost.post(url, formData, { ...headers, 'Content-Type': 'multipart/form-data' })

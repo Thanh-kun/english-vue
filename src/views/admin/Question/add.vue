@@ -170,14 +170,12 @@ const handleSubmitFormInModal = async () => {
     let data = {
       content: questionFormData.content,
       name: questionFormData.name,
-      answers: encodeURIComponent(
-        JSON.stringify([
-          { id: 1, content: questionFormData.answer1 },
-          { id: 2, content: questionFormData.answer2 },
-          { id: 3, content: questionFormData.answer3 },
-          { id: 4, content: questionFormData.answer4 }
-        ])
-      ),
+      answers: JSON.stringify([
+        { id: 1, content: questionFormData.answer1 },
+        { id: 2, content: questionFormData.answer2 },
+        { id: 3, content: questionFormData.answer3 },
+        { id: 4, content: questionFormData.answer4 }
+      ]),
       trueAnswer: questionFormData.trueAnswer,
       type: questionFormData.type,
       partId: questionFormData.partId,
@@ -191,6 +189,8 @@ const handleSubmitFormInModal = async () => {
         message: 'New question added'
       })
       questionFormDataRef.value.resetFields()
+      audioInfo.value = {}
+      imageInfo.value = {}
     } else throw new Error(response.data?.message)
   } catch (err) {
     notification.error({
