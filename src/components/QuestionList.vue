@@ -32,10 +32,11 @@ const handleClick = (item) => {
   <div class="flex flex-wrap -mt-2 -mx-1">
     <div class="pt-2 px-1" v-for="item of items" :key="item.value">
       <QuestionItem
-        :isSelected="listAnswer?.[item.id] >= 1"
+        :isSuccess="item.isSuccess"
+        :isFailure="item.isFailure"
         :active="item.value === selectedItem"
-        @click="() => handleClick(item)"
         :noneSelected="noneSelected"
+        @click="() => handleClick(item)"
       >
         {{ item.label }}
       </QuestionItem>

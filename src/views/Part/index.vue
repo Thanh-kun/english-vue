@@ -6,9 +6,11 @@ import { useLesson, usePart, useTest } from '@/stores'
 import { useRoute } from 'vue-router'
 import { computed } from 'vue'
 
+// Route
 const route = useRoute()
-let partId = route.params?.partId
+let { partId } = route.params
 
+// Reactive
 const lessonStore = useLesson()
 const testStore = useTest()
 const partStore = usePart()
@@ -22,14 +24,15 @@ const lessons = computed(() => {
 const tests = computed(() => {
   return testStore?.tests[partId] ?? []
 })
-const partItem = computed(() => {
+const currentPart = computed(() => {
   return partStore.parts.find((item) => item.id === Number(partId))
 })
 const isListening = computed(() => {
   return partStore.listeningParts.findIndex((item) => item.id === Number(partId)) >= 0
 })
 
-if (!(partId in lessonStore.lessons)) {
+// Methods
+const getLessons = async () => {
   try {
     let response = await commonApi.getLesson(partId)
     if (response.status === 200 && response.data.success === true) {
@@ -39,8 +42,7 @@ if (!(partId in lessonStore.lessons)) {
     console.log(err?.message)
   }
 }
-
-if (!(partId in testStore.tests)) {
+const getParts = async () => {
   try {
     let response = await commonApi.getTest(partId)
     if (response.status === 200 && response.data.success === true) {
@@ -49,6 +51,24 @@ if (!(partId in testStore.tests)) {
   } catch (err) {
     console.log(err?.message)
   }
+}
+const handleClickLesson = async (lesson) => {
+  try {
+    let response = await commonApi.readLesson(lesson.id)
+    if (response.status === 200 && response.data.success === true) {
+      getLessons()
+    } else throw new Error()
+  } catch (err) {
+    console.error(err.message)
+  }
+}
+
+// Run code
+if (!(partId in lessonStore.lessons)) {
+  getLessons()
+}
+if (!(partId in testStore.tests)) {
+  getParts()
 }
 </script>
 <template>
@@ -63,13 +83,16 @@ if (!(partId in testStore.tests)) {
       <div class="flex flex-wrap -mt-6 -mx-3">
         <div class="w-full xl:w-3/4 pt-6 px-3">
           <div class="bg-white p-6 rounded-3xl border mb-3">
-            <h2 class="text-xl font-bold mb-4">{{ partItem.sub_name }}: {{ partItem.name }}</h2>
+            <h2 class="text-xl font-bold mb-4">
+              {{ currentPart.sub_name }}: {{ currentPart.name }}
+            </h2>
             <LessonBox>
               <RouterLink
                 :to="{ name: 'lesson', params: { partId, lessonId: lesson.id } }"
                 v-for="lesson of lessons"
                 :key="lesson.id"
                 class="no-underline"
+                @click="() => handleClickLesson(lesson)"
               >
                 <LessonItem>
                   {{ lesson.name }}
@@ -89,9 +112,17 @@ if (!(partId in testStore.tests)) {
                   <div
                     class="text-3xl text-center font-black text-gray-400 py-6 border-b border-dashed border-gray-300"
                   >
-                    <span v-if="correct === null || correct === undefined" class="text-green-300"
-                      >{{ Math.round((test.correct / (test.failed + test.correct)) * 100) }}%</span
+                    <span
+                      v-if="test.correct !== null && test.correct !== undefined"
+                      class="text-green-300"
                     >
+                      <span v-if="test.failed + test.correct === 0">100%</span>
+                      <span v-else
+                        >{{
+                          Math.round((test.correct / (test.failed + test.correct)) * 100)
+                        }}%</span
+                      >
+                    </span>
                     <span v-else>0%</span>
                   </div>
                   <div class="pb-6 pt-4">

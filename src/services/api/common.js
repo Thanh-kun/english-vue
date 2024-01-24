@@ -130,6 +130,10 @@ class CommonApi {
     let { testId, questionId } = data
     return adminHost.post(url, { test_id: testId, question_id: questionId }, headers)
   }
+  readLesson(lessonId, headers) {
+    let url = '/lesson/detail/' + lessonId
+    return adminHost.get(url, headers)
+  }
 }
 
 const commonApi = new CommonApi()
