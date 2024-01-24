@@ -2,6 +2,7 @@ import { LogoutOutlined } from '@ant-design/icons-vue'
 import { computed, h, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { usePart, useUser } from '@/stores'
+import { Modal } from 'ant-design-vue'
 
 export default function useMenu() {
   const route = useRoute()
@@ -87,7 +88,15 @@ export default function useMenu() {
         ]
       } else {
         items = [
+          {
+            label: h(RouterLink, { to: '/user-info' }, { default: () => 'User Info' }),
+            key: '/user-info'
+          },
           ...items,
+          {
+            label: h(RouterLink, { to: '/change-password' }, { default: () => 'Chage Password' }),
+            key: '/change-password'
+          },
           {
             label: h(
               'div',
@@ -101,10 +110,25 @@ export default function useMenu() {
             ),
             key: Symbol('logout'),
             onClick: () => {
-              userStore.clearToken()
-              router.push('/sign-in')
+              Modal.confirm({
+                title: 'Are you sure you want to log out?',
+                onOk: () => {
+                  userStore.clearToken()
+                  router.push('/sign-in')
+                }
+              })
             }
           }
+        ]
+      }
+      
+      if (userStore.userInfo.role === 'admin') {
+        items = [
+          {
+            label: h(RouterLink, { to: '/admin' }, { default: () => 'Admin' }),
+            key: '/sign-in'
+          },
+          ...items
         ]
       }
 
