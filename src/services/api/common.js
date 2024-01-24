@@ -97,12 +97,12 @@ class CommonApi {
     var formData = new FormData()
 
     console.log(audio)
-    formData.append('name', name);
-    formData.append('content', content);
-    formData.append('answers', answers);
-    formData.append('type', type);
-    formData.append('part_id', partId);
-    formData.append('true_answer', trueAnswer);
+    formData.append('name', name)
+    formData.append('content', content)
+    formData.append('answers', answers)
+    formData.append('type', type)
+    formData.append('part_id', partId)
+    formData.append('true_answer', trueAnswer)
     formData.append('image', image)
     formData.append('audio', audio)
     return adminHost.post(url, formData, { ...headers, 'Content-Type': 'multipart/form-data' })
@@ -124,6 +124,11 @@ class CommonApi {
   deleteTest(data, headers) {
     let url = '/admin/test/' + data.id
     return adminHost.delete(url, headers)
+  }
+  addQuestionToTest(data = {}, headers) {
+    let url = '/admin/test-question'
+    let { testId, questionId } = data
+    return adminHost.post(url, { test_id: testId, question_id: questionId }, headers)
   }
 }
 

@@ -20,6 +20,9 @@ import { computed, nextTick, reactive, ref } from 'vue'
 const parts = ref([])
 const partsLoading = ref(false)
 
+const tests = ref([])
+const testsLoading = ref(false)
+
 const questionFormData = reactive({
   content: undefined,
   name: undefined,
@@ -30,6 +33,7 @@ const questionFormData = reactive({
   trueAnswer: undefined,
   type: 3,
   partId: undefined,
+  testId: undefined,
   image: undefined,
   audio: undefined
 })
@@ -47,6 +51,12 @@ const audioInfo = ref({
 
 const partItems = computed(() => {
   return parts.value.map((item) => ({ value: item.id, label: item.sub_name + ' :' + item.name }))
+})
+
+const testOptions = computed(() => {
+  return tests.value
+    .filter((item) => item.part_id === questionFormData.partId)
+    .map((item) => ({ value: item.id, label: item.name }))
 })
 
 // Select Options
@@ -124,6 +134,23 @@ const getParts = async () => {
     partsLoading.value = false
   }
 }
+const getTests = async () => {
+  try {
+    testsLoading.value = true
+    let response = await commonApi.getTests({ page: 1, size: 1000000 })
+    if (response.data && response.data.success === true && response.data.data) {
+      tests.value = response.data?.data?.content ?? []
+      console.log(tests.value)
+    } else throw new Error(response.data?.message)
+  } catch (err) {
+    notification.error({
+      message: 'An error occurred, please try again!',
+      description: err.message
+    })
+  } finally {
+    testsLoading.value = false
+  }
+}
 const beforeUploadImage = (file) => {
   const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
   if (!isJpgOrPng) {
@@ -171,6 +198,8 @@ const handleChangeAudio = ({ file }) => {
   })
 }
 const handleSubmitFormInModal = async () => {
+  let isFailure = false
+  let questionId;
   try {
     submitLoading.value = true
     let data = {
@@ -190,30 +219,59 @@ const handleSubmitFormInModal = async () => {
     }
     let response = await commonApi.addQuestion(data)
     if (response.status === 200 && response.data.success === true) {
-      notification.success({
-        message: 'You have successfully added a new question.'
-      })
-      questionFormDataRef.value.resetFields()
-      imageInfo.value = { file: null, previewUrl: '' }
-      audioInfo.value = { file: null, previewUrl: '' }
+      // Success
+      questionId = response.data?.data?.id;
     } else throw new Error(response.data?.message)
   } catch (err) {
+    isFailure = true
+    submitLoading.value = false
     notification.error({
       message: 'An error occurred, please try again!',
       description: err.message
     })
-  } finally {
-    submitLoading.value = false
   }
+
+  if (isFailure) return
+  
+  try {
+    let data = {
+      questionId,
+      testId: questionFormData.testId
+    }
+    let response = await commonApi.addQuestionToTest(data)
+    if (response.status === 200 && response.data.success === true) {
+      notification.success({
+        message: 'You have successfully added a new question.'
+      })
+    } else throw new Error(response.data?.message)
+  } catch (err) {
+    isFailure = true
+    notification.error({
+      message: 'There was an error, and it was not possible to add the question to the test!',
+      description: err.message
+    })
+  }
+
+  questionFormDataRef.value.resetFields()
+  imageInfo.value = { file: null, previewUrl: '' }
+  audioInfo.value = { file: null, previewUrl: '' }
+  submitLoading.value = false
 }
 
 getParts()
+getTests()
 </script>
 <template>
   <div>
     <h1 class="mb-8">Add Question</h1>
     <div class="mb-8">
-      <Form layout="vertical" :model="questionFormData" :rules="rules" ref="questionFormDataRef" @finish="handleSubmitFormInModal">
+      <Form
+        layout="vertical"
+        :model="questionFormData"
+        :rules="rules"
+        ref="questionFormDataRef"
+        @finish="handleSubmitFormInModal"
+      >
         <FormItem label="Name" name="name">
           <Input
             v-model:value="questionFormData.name"
@@ -231,7 +289,20 @@ getParts()
             >
             </Select>
           </FormItem>
-          <FormItem label="Type" name="type">
+          <FormItem label="Test" name="testId" class="flex-1">
+            <Select
+              :options="testOptions"
+              v-model:value="questionFormData.testId"
+              class="w-full"
+              placeholder="Enter the test"
+              :loading="testsLoading"
+              :disabled="!questionFormData.partId"
+            >
+            </Select>
+          </FormItem>
+        </div>
+        <div class="grid md:grid-cols-2 md:gap-4">
+          <FormItem label="Type" name="type" class="flex-1">
             <Select
               :options="questionTypes"
               v-model:value="questionFormData.type"
@@ -240,59 +311,63 @@ getParts()
             >
             </Select>
           </FormItem>
+          <FormItem label="Content" name="content" class="flex-1">
+            <Input v-model:value="questionFormData.content" placeholder="Enter question content" />
+          </FormItem>
         </div>
-        <FormItem label="Content" name="content">
-          <Input v-model:value="questionFormData.content" placeholder="Enter question content" />
-        </FormItem>
-        <FormItem label="Image" name="image">
-          <Upload
-            v-model:file-list="questionFormData.image"
-            name="image"
-            list-type="picture-card"
-            :show-upload-list="false"
-            :custom-request="customPreventRequest"
-            :before-upload="beforeUploadImage"
-            @change="handleChangeImage"
-          >
-            <div v-if="imageInfo?.file" class="w-full h-full overflow-hidden">
-              <img
-                :src="imageInfo?.previewUrl"
-                alt=""
-                class="rounded-md object-cover w-full h-full"
-              />
-            </div>
-            <div v-else>
-              <PlusOutlined></PlusOutlined>
-              <div class="ant-upload-text">Upload</div>
-            </div>
-          </Upload>
-        </FormItem>
-        <FormItem label="Audio" name="audio">
-          <Upload
-            v-model:file-list="questionFormData.audio"
-            name="audio"
-            :show-upload-list="false"
-            :custom-request="customPreventRequest"
-            :before-upload="beforeUploadAudio"
-            @change="handleChangeAudio"
-            v-if="!audioInfo?.file"
-          >
-            <div>
-              <div
-                class="h-[128px] w-[128px] border rounded-md border-dashed flex flex-col items-center justify-center border-gray-200"
-                style="background-color: rgba(0, 0, 0, 0.02)"
-              >
+        <div class="grid md:grid-cols-2 md:gap-4">
+          <FormItem label="Image" name="image">
+            <Upload
+              v-model:file-list="questionFormData.image"
+              name="image"
+              list-type="picture-card"
+              class="flex-1"
+              :show-upload-list="false"
+              :custom-request="customPreventRequest"
+              :before-upload="beforeUploadImage"
+              @change="handleChangeImage"
+            >
+              <div v-if="imageInfo?.file" class="w-full h-full overflow-hidden">
+                <img
+                  :src="imageInfo?.previewUrl"
+                  alt=""
+                  class="rounded-md object-cover w-full h-full"
+                />
+              </div>
+              <div v-else>
                 <PlusOutlined></PlusOutlined>
                 <div class="ant-upload-text">Upload</div>
               </div>
+            </Upload>
+          </FormItem>
+          <FormItem label="Audio" name="audio">
+            <Upload
+              class="flex-1"
+              v-model:file-list="questionFormData.audio"
+              name="audio"
+              :show-upload-list="false"
+              :custom-request="customPreventRequest"
+              :before-upload="beforeUploadAudio"
+              @change="handleChangeAudio"
+              v-if="!audioInfo?.file"
+            >
+              <div>
+                <div
+                  class="h-[128px] w-[128px] border rounded-md border-dashed flex flex-col items-center justify-center border-gray-200"
+                  style="background-color: rgba(0, 0, 0, 0.02)"
+                >
+                  <PlusOutlined></PlusOutlined>
+                  <div class="ant-upload-text">Upload</div>
+                </div>
+              </div>
+            </Upload>
+            <div v-else>
+              <audio controls ref="audioRef">
+                <source :src="audioInfo?.previewUrl" type="audio/mpeg" />
+              </audio>
             </div>
-          </Upload>
-          <div v-else>
-            <audio controls ref="audioRef">
-              <source :src="audioInfo?.previewUrl" type="audio/mpeg" />
-            </audio>
-          </div>
-        </FormItem>
+          </FormItem>
+        </div>
         <FormItem label="True Answer" name="trueAnswer">
           <RadioGroup v-model:value="questionFormData.trueAnswer" class="w-full">
             <div class="px-8 pt-8 pb-4 mb-6 rounded-md bg-gray-100">
@@ -320,12 +395,7 @@ getParts()
           </RadioGroup>
         </FormItem>
         <FormItem>
-          <Button
-            type="primary"
-            html-type="submit"
-            :loading="submitLoading"
-            >Submit</Button
-          >
+          <Button type="primary" html-type="submit" :loading="submitLoading">Submit</Button>
         </FormItem>
       </Form>
     </div>

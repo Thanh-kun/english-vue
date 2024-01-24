@@ -193,7 +193,7 @@ const handleDelete = (item) => {
     </div>
     <div class="mb-4">
       <RouterLink :to="{ name: 'adminQuestionAdd' }">
-        <Button class="!inline-flex items-center" type="primary" @click="showAddModal">
+        <Button class="!inline-flex items-center" type="primary">
           <template #icon>
             <PlusOutlined />
           </template>

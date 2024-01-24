@@ -1,5 +1,5 @@
 import { h, computed } from 'vue'
-import { useRoute, RouterLink } from 'vue-router'
+import { useRoute, RouterLink, useRouter } from 'vue-router'
 import {
   UserOutlined,
   ContainerOutlined,
@@ -10,11 +10,14 @@ import {
   FileDoneOutlined,
   LinkOutlined
 } from '@ant-design/icons-vue'
-import { useTheme } from '@/stores/theme'
+import { useUser, useTheme } from '@/stores'
+import { Modal } from 'ant-design-vue'
 
 export default function useSidebar() {
+  const router = useRouter()
   const route = useRoute()
   const themeStore = useTheme()
+  const userStore = useUser();
 
   const menuItems = [
     // {
@@ -55,12 +58,21 @@ export default function useSidebar() {
     {
       label: 'Log out',
       key: 'logout',
-      icon: h(LoginOutlined)
+      icon: h(LoginOutlined),
+      onclick: () => {
+        Modal.confirm({
+          title: 'Are you sure you want to log out?',
+          onOk: () => {
+            userStore.clearToken();
+            router.push('/sign-in');
+          }
+        })
+      }
     }
   ]
 
   const selectedKeys = computed(() => {
-    return menuItems.filter((item) => route.path === item.key).map((item) => item.key)
+    return menuItems.filter((item) => route.path === item.key || route.path.startsWith(item.key + '/')).map((item) => item.key)
   })
 
   const collapsed = computed(() => themeStore.collapsedMenu)

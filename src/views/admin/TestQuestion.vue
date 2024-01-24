@@ -1,40 +1,25 @@
 <script setup>
 import { commonApi } from '@/services'
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons-vue'
-import { Table, notification, Select, Button, Form, FormItem, Input, Modal } from 'ant-design-vue'
+import { Table, notification, Select, Button, Modal, Form, FormItem } from 'ant-design-vue'
 import { computed, reactive, ref } from 'vue'
-import Editor from '@tinymce/tinymce-vue'
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
 
+// Reactive
 const parts = ref([])
-const lessons = ref([])
+const partsLoading = ref(false)
+
+const tests = ref([])
+const testsLoading = ref(false)
+
+const questions = ref([])
 const pageSize = ref(10)
 const current = ref(1)
 const total = ref(0)
-const partsLoading = ref(false)
-const lessonsLoading = ref(false)
+const questionsLoading = ref(false)
 
 const searchFormData = reactive({
-  partId: undefined
-})
-
-const isEdit = ref(false)
-const lessonFormData = ref({
-  name: '',
-  content: '',
-  partId: ''
-})
-const confirmLoading = ref(false)
-const visibleModal = ref(false)
-const lessonFormDataRef = ref()
-
-const rules = {
-  name: [{ required: true, message: 'Please input name!' }],
-  content: [{ required: true, message: 'Please input content!' }],
-  partId: [{ required: true, message: 'Please input part!' }]
-}
-
-const partOptions = computed(() => {
-  return parts.value.map((item) => ({ value: item.id, label: item.sub_name + ': ' + item.name }))
+  partId: undefined,
+  testId: undefined
 })
 
 const pagination = computed(() => {
@@ -45,42 +30,72 @@ const pagination = computed(() => {
     showSizeChanger: true
   }
 })
+const partOptions = computed(() => {
+  return parts.value.map((item) => ({ value: item.id, label: item.sub_name + ': ' + item.name }))
+})
+const testOptions = computed(() => {
+  return tests.value
+    .filter((item) => item.part_id === searchFormData.partId)
+    .map((item) => ({ value: item.id, label: item.name }))
+})
 
+const searchRules = {
+  partId: [{ required: true, message: 'Please select the part to search' }],
+  testId: [{ required: true, message: 'Please select the test to search' }]
+}
+// Options
+const questionTypes = [
+  {
+    value: 1,
+    label: 'Image'
+  },
+  {
+    value: 2,
+    label: 'Audio'
+  },
+  {
+    value: 3,
+    label: 'Paragraph'
+  }
+]
 const columns = [
+  {
+    title: 'Id',
+    dataIndex: 'id',
+    key: 'id'
+  },
   {
     title: 'Name',
     dataIndex: 'name',
     key: 'name'
   },
   {
-    title: 'Content',
-    dataIndex: 'content',
-    key: 'content'
+    title: 'Type',
+    dataIndex: 'type',
+    key: 'type'
   },
   {
-    title: 'Part_id',
-    dataIndex: 'part_id',
-    key: 'part_id'
-  },
-  {
-    title: 'Created at',
-    dataIndex: 'created_at',
-    key: 'created_at'
+    title: 'Part Id',
+    dataIndex: 'partId',
+    key: 'partId'
   },
   {
     title: 'Action',
     key: 'action',
-    width: '144px'
+    width: '88px'
   }
 ]
 
+// Methods
+const handleChangePartInSearch = () => {
+  searchFormData.testId = undefined
+}
 const getParts = async () => {
   try {
     partsLoading.value = true
     let response = await commonApi.getPart()
     if (response.data && response.data.success === true && response.data.data) {
       parts.value = response.data?.data ?? []
-      searchFormData.partId = parts.value.length > 0 ? parts.value[0].id : undefined
     } else throw new Error(response.data?.message)
   } catch (err) {
     notification.error({
@@ -91,15 +106,14 @@ const getParts = async () => {
     partsLoading.value = false
   }
 }
-await getParts()
 
-const getLessons = async () => {
+const getTests = async () => {
   try {
-    lessonsLoading.value = true
-    let response = await commonApi.getLesson(searchFormData.partId)
+    testsLoading.value = true
+    let response = await commonApi.getTests({ page: 1, size: 1000000 })
     if (response.data && response.data.success === true && response.data.data) {
-      lessons.value = response.data?.data ?? []
-      total.value = lessons.value.length
+      tests.value = response.data?.data?.content ?? []
+      console.log(tests.value)
     } else throw new Error(response.data?.message)
   } catch (err) {
     notification.error({
@@ -107,98 +121,57 @@ const getLessons = async () => {
       description: err.message
     })
   } finally {
-    lessonsLoading.value = false
+    testsLoading.value = false
   }
 }
-getLessons()
 
-const handleChange = async (page) => {
-  pageSize.value = page.pageSize
-  current.value = page.current
-}
-
-const partIdToText = (partId) => {
-  return partOptions.value.find((item) => item.value === partId)?.label
-}
-
-const showAddModal = () => {
-  lessonFormData.value = {
-    id: '',
-    name: '',
-    content: '',
-    partId: ''
-  }
-  isEdit.value = false
-  visibleModal.value = true
-}
-
-const showEditModal = (item) => {
-  lessonFormData.value = {
-    id: item.id,
-    name: item.name,
-    content: item.content,
-    partId: item.part_id
-  }
-  isEdit.value = true
-  visibleModal.value = true
-}
-
-const handleSubmitFormInModal = async () => {
+const getQuestions = async () => {
   try {
-    // eslint-disable-next-line no-unused-vars
-    let values = await lessonFormDataRef.value.validateFields()
-    console.log(lessonFormData.value)
-    let data = {
-      id: lessonFormData.value.id,
-      name: lessonFormData.value.name,
-      content: lessonFormData.value.content,
-      partId: lessonFormData.value.partId
-    }
-    let response
-    confirmLoading.value = true
-    if (!isEdit.value) {
-      response = await commonApi.addLesson(data)
-      if (response.data && response.data.success === true) {
-        notification.success({
-          message: 'New lesson added'
-        })
-        await getLessons()
-        visibleModal.value = false
-      } else throw new Error(response.data?.message)
-    } else if (isEdit.value) {
-      response = await commonApi.editLesson(data)
-      if (response.data && response.data.success === true) {
-        notification.success({
-          message: 'Updated lesson'
-        })
-        await getLessons()
-        visibleModal.value = false
-      } else throw new Error(response.data?.message)
-    }
+    questionsLoading.value = true
+    let response = await commonApi.getTestById(searchFormData.testId)
+    if (response.data && response.data.success === true && response.data.data) {
+      questions.value = response.data?.data?.questions ?? []
+      total.value = response.data?.data?.questions.length ?? 0
+    } else throw new Error(response.data?.message)
   } catch (err) {
     notification.error({
       message: 'An error occurred, please try again!',
       description: err.message
     })
   } finally {
-    confirmLoading.value = false
+    questionsLoading.value = false
   }
+}
+
+const handleChange = async (page) => {
+  pageSize.value = page.pageSize
+  current.value = page.current
+  await getQuestions()
+}
+
+const typeToText = (typeId) => {
+  return questionTypes.find((item) => item.value === typeId)?.label
+}
+
+const partIdToText = (partId) => {
+  return partOptions.value.find((item) => item.value === partId)?.label
 }
 
 const handleDelete = (item) => {
   Modal.confirm({
-    title: 'Do you want to delete the lesson?',
+    title: 'Do you want to delete the question?',
     onOk: async () => {
       try {
         let data = {
           id: item.id
         }
-        let response = await commonApi.deleteLesson(data)
+        console.log(data)
+        let response = await commonApi.deleteQuestion(data)
         if (response.data && response.data.success === true) {
           notification.success({
-            message: 'Lesson has been deleted'
+            message: 'Question has been deleted'
           })
-          await getLessons()
+          await getQuestions()
         } else throw new Error(response.data?.message)
       } catch (err) {
         notification.error({
@@ -209,62 +182,78 @@ const handleDelete = (item) => {
     }
   })
 }
+
+getParts()
+getTests()
 </script>
 <template>
   <div>
-    <h1 class="mb-8">Test - Question</h1>
+    <h1 class="mb-8">Questions</h1>
     <div class="flex gap-4 lg:flex-row flex-col mb-8">
-      <Select
-        :options="partOptions"
-        v-model:value="searchFormData.partId"
-        class="w-full"
-        placeholder="Enter the part"
-        :loading="partsLoading"
-      >
-      </Select>
-      <Button type="primary" :loading="lessonsLoading" @click="getLessons">Search</Button>
+      <Form :rules="searchRules" :model="searchFormData" layout="vertical" @finish="getQuestions" class="w-full">
+        <div class="flex md:flex-row flex-col gap-4">
+          <div class="flex-1">
+            <FormItem label="Part" name="partId" class="flex-1">
+              <Select
+                :options="partOptions"
+                v-model:value="searchFormData.partId"
+                class="w-full"
+                placeholder="Enter the part"
+                :loading="partsLoading"
+                @change="handleChangePartInSearch"
+              >
+              </Select>
+            </FormItem>
+          </div>
+          <div class="flex-1">
+            <FormItem label="Test" name="testId" class="flex-1">
+              <Select
+                :options="testOptions"
+                v-model:value="searchFormData.testId"
+                class="w-full"
+                placeholder="Enter the test"
+                :loading="testsLoading"
+                :disabled="!searchFormData.partId"
+              >
+              </Select>
+            </FormItem>
+          </div>
+          <div class="self-end">
+            <FormItem>
+              <Button type="primary" :loading="questionsLoading" html-type="submit" :disabled="partsLoading || testsLoading">Search</Button>
+            </FormItem>
+          </div>
+        </div>
+      </Form>
     </div>
-    <div class="mb-8">
-      <Button class="!inline-flex items-center" type="primary" @click="showAddModal">
-        <template #icon>
-          <PlusOutlined />
-        </template>
-        Add
-      </Button>
+    <div class="mb-4">
+      <RouterLink :to="{ name: 'adminQuestionAdd' }">
+        <Button class="!inline-flex items-center" type="primary">
+          <template #icon>
+            <PlusOutlined />
+          </template>
+          Add
+        </Button>
+      </RouterLink>
     </div>
     <div>
       <Table
-        :dataSource="lessons"
+        :dataSource="questions"
         :columns="columns"
         :pagination="pagination"
         @change="handleChange"
-        :loading="lessonsLoading"
+        :loading="questionsLoading"
         bordered
       >
         <template #bodyCell="{ text, column, record }">
-          <template v-if="column.key === 'name'">
-            <div class="line-clamp-3" :title="text">
-              {{ text }}
-            </div>
+          <template v-if="column.key === 'type'">
+            <span>{{ typeToText(text) }}</span>
           </template>
-          <template v-if="column.key === 'content'">
-            <div class="line-clamp-3" :title="text">
-              {{ text }}
-            </div>
-          </template>
-          <template v-if="column.key === 'created_at'">
-            <div class="line-clamp-3" :title="text">
-              {{ text }}
-            </div>
-          </template>
-          <template v-if="column.key === 'part_id'">
-            <span class="line-clamp-3" :title="partIdToText(text)">{{ partIdToText(text) }}</span>
+          <template v-if="column.key === 'partId'">
+            <span class="line-clamp-3">{{ partIdToText(text) }}</span>
           </template>
           <template v-if="column.key === 'action'">
             <div class="flex gap-2">
-              <Button @click="() => showEditModal(record)" class="!inline-flex !items-center">
-                <EditOutlined />
-              </Button>
               <Button @click="() => handleDelete(record)" class="!inline-flex !items-center" danger>
                 <DeleteOutlined />
               </Button>
@@ -273,53 +262,5 @@ const handleDelete = (item) => {
         </template>
       </Table>
     </div>
-    <Teleport to="body">
-      <Modal
-        v-model:open="visibleModal"
-        class="!w-full !max-w-4xl"
-        :title="isEdit ? 'Edit Lesson' : 'Add Lesson'"
-        :confirmLoading="confirmLoading"
-        okText="Submit"
-        @ok="handleSubmitFormInModal"
-      >
-        <div>
-          <Form layout="vertical" :model="lessonFormData" :rules="rules" ref="lessonFormDataRef">
-            <FormItem label="Name" name="name">
-              <Input v-model:value="lessonFormData.name" />
-            </FormItem>
-            <FormItem label="Content" name="content">
-              <!-- <Input v-model:value="lessonFormData.content" /> -->
-              <Editor
-                api-key="uwz9im0bsj2tdn6ekifzoq0trcgaksh3y7ddgkrbrue65hyc"
-                :init="{
-                  height: 500,
-                  menubar: false,
-                  plugins: [
-                    'advlist autolink lists link image charmap print preview anchor',
-                    'searchreplace visualblocks code fullscreen',
-                    'insertdatetime media table paste code help wordcount'
-                  ],
-                  toolbar:
-                    'undo redo | formatselect | bold italic backcolor | \
-                      alignleft aligncenter alignright alignjustify | \
-                      bullist numlist outdent indent | removeformat | help'
-                }"
-                v-model="lessonFormData.content"
-              />
-            </FormItem>
-            <FormItem label="Part" name="partId">
-              <Select
-                :options="partOptions"
-                v-model:value="lessonFormData.partId"
-                class="w-full"
-                placeholder="Enter the part"
-                :loading="partsLoading"
-              >
-              </Select>
-            </FormItem>
-          </Form>
-        </div>
-      </Modal>
-    </Teleport>
   </div>
 </template>
