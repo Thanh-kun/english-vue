@@ -199,7 +199,7 @@ const handleChangeAudio = ({ file }) => {
 }
 const handleSubmitFormInModal = async () => {
   let isFailure = false
-  let questionId;
+  let questionId
   try {
     submitLoading.value = true
     let data = {
@@ -220,7 +220,7 @@ const handleSubmitFormInModal = async () => {
     let response = await commonApi.addQuestion(data)
     if (response.status === 200 && response.data.success === true) {
       // Success
-      questionId = response.data?.data?.id;
+      questionId = response.data?.data?.id
     } else throw new Error(response.data?.message)
   } catch (err) {
     isFailure = true
@@ -232,7 +232,7 @@ const handleSubmitFormInModal = async () => {
   }
 
   if (isFailure) return
-  
+
   try {
     let data = {
       questionId,

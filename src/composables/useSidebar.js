@@ -17,7 +17,7 @@ export default function useSidebar() {
   const router = useRouter()
   const route = useRoute()
   const themeStore = useTheme()
-  const userStore = useUser();
+  const userStore = useUser()
 
   const menuItems = [
     // {
@@ -63,8 +63,8 @@ export default function useSidebar() {
         Modal.confirm({
           title: 'Are you sure you want to log out?',
           onOk: () => {
-            userStore.clearToken();
-            router.push('/sign-in');
+            userStore.clearToken()
+            router.push('/sign-in')
           }
         })
       }
@@ -72,7 +72,9 @@ export default function useSidebar() {
   ]
 
   const selectedKeys = computed(() => {
-    return menuItems.filter((item) => route.path === item.key || route.path.startsWith(item.key + '/')).map((item) => item.key)
+    return menuItems
+      .filter((item) => route.path === item.key || route.path.startsWith(item.key + '/'))
+      .map((item) => item.key)
   })
 
   const collapsed = computed(() => themeStore.collapsedMenu)

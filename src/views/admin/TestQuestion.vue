@@ -2,7 +2,7 @@
 import { commonApi } from '@/services'
 import { Table, notification, Select, Button, Modal, Form, FormItem } from 'ant-design-vue'
 import { computed, reactive, ref } from 'vue'
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
+import { DeleteOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons-vue'
 
 // Reactive
 const parts = ref([])
@@ -39,6 +39,7 @@ const testOptions = computed(() => {
     .map((item) => ({ value: item.id, label: item.name }))
 })
 
+// Validate Form
 const searchRules = {
   partId: [{ required: true, message: 'Please select the part to search' }],
   testId: [{ required: true, message: 'Please select the test to search' }]
@@ -75,7 +76,7 @@ const columns = [
     key: 'type'
   },
   {
-    title: 'Part Id',
+    title: 'Part',
     dataIndex: 'partId',
     key: 'partId'
   },
@@ -106,14 +107,12 @@ const getParts = async () => {
     partsLoading.value = false
   }
 }
-
 const getTests = async () => {
   try {
     testsLoading.value = true
     let response = await commonApi.getTests({ page: 1, size: 1000000 })
     if (response.data && response.data.success === true && response.data.data) {
       tests.value = response.data?.data?.content ?? []
-      console.log(tests.value)
     } else throw new Error(response.data?.message)
   } catch (err) {
     notification.error({
@@ -124,7 +123,6 @@ const getTests = async () => {
     testsLoading.value = false
   }
 }
-
 const getQuestions = async () => {
   try {
     questionsLoading.value = true
@@ -142,21 +140,17 @@ const getQuestions = async () => {
     questionsLoading.value = false
   }
 }
-
 const handleChange = async (page) => {
   pageSize.value = page.pageSize
   current.value = page.current
   await getQuestions()
 }
-
 const typeToText = (typeId) => {
   return questionTypes.find((item) => item.value === typeId)?.label
 }
-
 const partIdToText = (partId) => {
   return partOptions.value.find((item) => item.value === partId)?.label
 }
-
 const handleDelete = (item) => {
   Modal.confirm({
     title: 'Do you want to delete the question?',
@@ -165,7 +159,6 @@ const handleDelete = (item) => {
         let data = {
           id: item.id
         }
-        console.log(data)
         let response = await commonApi.deleteQuestion(data)
         if (response.data && response.data.success === true) {
           notification.success({
@@ -183,15 +176,22 @@ const handleDelete = (item) => {
   })
 }
 
+// Run code
 getParts()
 getTests()
 </script>
 <template>
   <div>
     <h1 class="mb-8">Questions</h1>
-    <div class="flex gap-4 lg:flex-row flex-col mb-8">
-      <Form :rules="searchRules" :model="searchFormData" layout="vertical" @finish="getQuestions" class="w-full">
-        <div class="flex md:flex-row flex-col gap-4">
+    <div class="flex gap-4 lg:flex-row flex-col mb-2">
+      <Form
+        :rules="searchRules"
+        :model="searchFormData"
+        layout="vertical"
+        @finish="getQuestions"
+        class="w-full"
+      >
+        <div class="flex md:flex-row flex-col gap-x-4">
           <div class="flex-1">
             <FormItem label="Part" name="partId" class="flex-1">
               <Select
@@ -218,9 +218,20 @@ getTests()
               </Select>
             </FormItem>
           </div>
-          <div class="self-end">
+          <div class="md:self-end">
             <FormItem>
-              <Button type="primary" :loading="questionsLoading" html-type="submit" :disabled="partsLoading || testsLoading">Search</Button>
+              <Button
+                type="primary"
+                :loading="questionsLoading"
+                html-type="submit"
+                :disabled="partsLoading || testsLoading"
+                class="!flex items-center justify-center w-full"
+              >
+                <template #icon>
+                  <SearchOutlined />
+                </template>
+                Search
+              </Button>
             </FormItem>
           </div>
         </div>

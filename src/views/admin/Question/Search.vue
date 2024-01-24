@@ -1,16 +1,19 @@
 <script setup>
 import { commonApi } from '@/services'
-import { Table, notification, Select, Button, Modal } from 'ant-design-vue'
+import { Table, notification, Select, Button, Modal, Form, FormItem } from 'ant-design-vue'
 import { computed, reactive, ref } from 'vue'
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
+import { DeleteOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons-vue'
 
+// Reactive
 const parts = ref([])
+const partsLoading = ref(false)
+
 const questions = ref([])
+const questionsLoading = ref(false)
+
 const pageSize = ref(10)
 const current = ref(1)
 const total = ref(0)
-const partsLoading = ref(false)
-const questionsLoading = ref(false)
 
 const searchFormData = reactive({
   partId: '',
@@ -25,6 +28,7 @@ const partOptions = computed(() => {
   ]
 })
 
+// Variable
 const questionTypes = [
   {
     value: 1,
@@ -40,13 +44,13 @@ const questionTypes = [
   }
 ]
 
-const questionTypeOptions = ref([
+const questionTypeOptions = [
   {
     value: '',
     label: 'All Question Types'
   },
   ...questionTypes
-])
+]
 
 const pagination = computed(() => {
   return {
@@ -57,6 +61,7 @@ const pagination = computed(() => {
   }
 })
 
+// Variable
 const columns = [
   {
     title: 'Id',
@@ -74,7 +79,7 @@ const columns = [
     key: 'type'
   },
   {
-    title: 'Part Id',
+    title: 'Part',
     dataIndex: 'partId',
     key: 'partId'
   },
@@ -85,13 +90,13 @@ const columns = [
   }
 ]
 
+// Methods
 const getParts = async () => {
   try {
     partsLoading.value = true
     let response = await commonApi.getPart()
     if (response.data && response.data.success === true && response.data.data) {
       parts.value = response.data?.data ?? []
-      total.value = parts.value.length
     } else throw new Error(response.data?.message)
   } catch (err) {
     notification.error({
@@ -102,8 +107,6 @@ const getParts = async () => {
     partsLoading.value = false
   }
 }
-getParts()
-
 const getQuestions = async () => {
   try {
     questionsLoading.value = true
@@ -127,22 +130,17 @@ const getQuestions = async () => {
     questionsLoading.value = false
   }
 }
-getQuestions()
-
 const handleChange = async (page) => {
   pageSize.value = page.pageSize
   current.value = page.current
   await getQuestions()
 }
-
 const typeToText = (typeId) => {
-  return questionTypeOptions.value.find((item) => item.value === typeId)?.label
+  return questionTypeOptions.find((item) => item.value === typeId)?.label
 }
-
 const partIdToText = (partId) => {
   return partOptions.value.find((item) => item.value === partId)?.label
 }
-
 const handleDelete = (item) => {
   Modal.confirm({
     title: 'Do you want to delete the question?',
@@ -151,13 +149,12 @@ const handleDelete = (item) => {
         let data = {
           id: item.id
         }
-        console.log(data)
         let response = await commonApi.deleteQuestion(data)
         if (response.data && response.data.success === true) {
           notification.success({
-            message: 'Question has been deleted'
+            message: 'The question has been deleted.'
           })
-          await getQuestions()
+          getQuestions()
         } else throw new Error(response.data?.message)
       } catch (err) {
         notification.error({
@@ -168,28 +165,57 @@ const handleDelete = (item) => {
     }
   })
 }
+
+// Run code
+getParts()
+getQuestions()
 </script>
 <template>
   <div>
     <h1 class="mb-8">Questions</h1>
-    <div class="flex gap-4 lg:flex-row flex-col mb-8">
-      <Select
-        :options="partOptions"
-        v-model:value="searchFormData.partId"
-        class="w-full"
-        placeholder="Enter the part"
-        :loading="partsLoading"
-      >
-      </Select>
-      <Select
-        :options="questionTypeOptions"
-        v-model:value="searchFormData.type"
-        class="w-full"
-        placeholder="Enter the type"
-        :loading="partsLoading"
-      >
-      </Select>
-      <Button type="primary" :loading="questionsLoading" @click="getQuestions">Search</Button>
+    <div class="flex gap-4 lg:flex-row flex-col mb-2">
+      <Form :model="searchFormData" layout="vertical" @finish="getQuestions" class="w-full">
+        <div class="flex md:flex-row flex-col gap-x-4">
+          <div class="flex-1">
+            <FormItem label="Part:" name="partId">
+              <Select
+                :options="partOptions"
+                v-model:value="searchFormData.partId"
+                class="w-full"
+                placeholder="Enter the part"
+                :loading="partsLoading"
+              />
+            </FormItem>
+          </div>
+          <div class="flex-1">
+            <FormItem label="Question Type:" name="type">
+              <Select
+                :options="questionTypeOptions"
+                v-model:value="searchFormData.type"
+                class="w-full"
+                placeholder="Enter the type"
+                :loading="partsLoading"
+              />
+            </FormItem>
+          </div>
+          <div class="md:self-end">
+            <FormItem>
+              <Button
+                type="primary"
+                :loading="questionsLoading"
+                html-type="submit"
+                class="!flex items-center justify-center w-full"
+                :disabled="partsLoading"
+              >
+                <template #icon>
+                  <SearchOutlined />
+                </template>
+                Search
+              </Button>
+            </FormItem>
+          </div>
+        </div>
+      </Form>
     </div>
     <div class="mb-4">
       <RouterLink :to="{ name: 'adminQuestionAdd' }">
