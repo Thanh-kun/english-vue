@@ -10,7 +10,9 @@ import {
   Select,
   notification,
   Upload,
-  message
+  message,
+  RadioGroup,
+  Radio
 } from 'ant-design-vue'
 import { computed, nextTick, reactive, ref } from 'vue'
 
@@ -31,35 +33,23 @@ const questionFormData = reactive({
   image: undefined,
   audio: undefined
 })
-
+const questionFormDataRef = ref(null)
+const audioRef = ref(null)
 const submitLoading = ref(false)
-const questionFormDataRef = ref()
+const imageInfo = ref({
+  file: null,
+  previewUrl: ''
+})
+const audioInfo = ref({
+  file: null,
+  previewUrl: ''
+})
 
 const partItems = computed(() => {
   return parts.value.map((item) => ({ value: item.id, label: item.sub_name + ' :' + item.name }))
 })
-const imageInfo = ref()
-const audioInfo = ref()
 
-const chooseAnswers = [
-  {
-    value: 1,
-    label: 'Answer 1'
-  },
-  {
-    value: 2,
-    label: 'Answer 2'
-  },
-  {
-    value: 3,
-    label: 'Answer 3'
-  },
-  {
-    value: 4,
-    label: 'Answer 4'
-  }
-]
-
+// Select Options
 const questionTypes = [
   {
     value: 1,
@@ -78,31 +68,42 @@ const questionTypes = [
 // Validte Form
 const validateImage = async (_rule, value) => {
   if (questionFormData.type === 1 && !value) {
-    return Promise.reject('Please add an image when selecting the image type')
+    return Promise.reject(
+      'Please add an image if the question type you selected is an image-based question!'
+    )
   }
   return Promise.resolve()
 }
 const validateAudio = async (_rule, value) => {
   if (questionFormData.type === 2 && !value) {
-    return Promise.reject('Please add an audio when selecting the image audio')
+    return Promise.reject(
+      'Please add audio if the question type you selected is an audio-based question!'
+    )
   }
   return Promise.resolve()
 }
 const rules = {
-  name: [{ required: true, message: 'Please input name!' }],
-  answers: [{ required: true, message: 'Please input answers!' }],
-  trueAnswer: [{ required: true, message: 'Please input trueAnswer!' }],
-  type: [{ required: true, message: 'Please input type!' }],
-  partId: [{ required: true, message: 'Please input part!' }],
-  answer1: [{ required: true, message: 'Please input answer 1!' }],
-  answer2: [{ required: true, message: 'Please input answer 2!' }],
-  answer3: [{ required: true, message: 'Please input answer 3!' }],
-  answer4: [{ required: true, message: 'Please input answer 4!' }],
+  name: [{ required: true, message: 'Please enter a description of the question type!' }],
+  trueAnswer: [{ required: true, message: 'Please choose the correct answer' }],
+  type: [{ required: true, message: 'Please enter the question type!' }],
+  partId: [
+    { required: true, message: 'Please specify the section to which the question belongs!' }
+  ],
+  answer1: [{ required: true, message: 'Please enter the first answer!' }],
+  answer2: [{ required: true, message: 'Please enter the second answer!' }],
+  answer3: [{ required: true, message: 'Please enter the third answer!' }],
+  answer4: [{ required: true, message: 'Please enter the fourth answer!' }],
   image: [
-    { validator: validateImage, message: 'Please add an image when selecting the image type' }
+    {
+      validator: validateImage,
+      message: 'Please add an image if the question type you selected is an image-based question!'
+    }
   ],
   audio: [
-    { validator: validateAudio, message: 'Please add an audio when selecting the audio type' }
+    {
+      validator: validateAudio,
+      message: 'Please add audio if the question type you selected is an audio-based question!'
+    }
   ]
 }
 
@@ -126,71 +127,75 @@ const getParts = async () => {
 const beforeUploadImage = (file) => {
   const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
   if (!isJpgOrPng) {
-    message.error('You can only upload JPG file!')
+    message.error('You can only upload JPG & PNG file!')
   }
-  const isLt2M = file.size / 1024 / 1024 < 2
+  const isLt2M = file.size / 1024 / 1024 < 25
   if (!isLt2M) {
-    message.error('Image must smaller than 2MB!')
+    message.error('Image must smaller than 25MB!')
   }
   return (isJpgOrPng && isLt2M) || Upload.LIST_IGNORE
 }
 const beforeUploadAudio = (file) => {
   const isMpeg = file.type === 'audio/mpeg'
   if (!isMpeg) {
-    message.error('You can only upload JPG file!')
+    message.error('You can only upload MPEG file!')
   }
-  return isMpeg || Upload.LIST_IGNORE
-}
-const handleChangeImage = (info) => {
-  if (info.file.status !== 'uploading') {
-    // Get this url from response in real world.
-    getBase64(info.file.originFileObj, (base64Url) => {
-      info.file.url = base64Url
-      imageInfo.value = JSON.parse(JSON.stringify(info.file))
-    })
+  const isLt2M = file.size / 1024 / 1024 < 25
+  if (!isLt2M) {
+    message.error('Image must smaller than 25MB!')
   }
+  return (isMpeg && isLt2M) || Upload.LIST_IGNORE
 }
-const handleChangeAudio = (info) => {
-  if (info.file.status !== 'uploading') {
-    // Get this url from response in real world.
-    if (audioInfo.value?.url) {
-      URL.revokeObjectURL(audioInfo.value.url)
+const customPreventRequest = async (options) => {
+  const { onSuccess, file } = options
+  onSuccess(file)
+}
+const handleChangeImage = ({ file }) => {
+  getBase64(file.originFileObj, (base64Url) => {
+    imageInfo.value = {
+      file: file.originFileObj,
+      previewUrl: base64Url
     }
-    info.file.url = URL.createObjectURL(info.file?.originFileObj)
-    audioInfo.value = info.file
-    nextTick(() => {
-      document.getElementById('audio').load()
-    })
+  })
+}
+const handleChangeAudio = ({ file }) => {
+  if (audioInfo.value?.previewUrl) {
+    URL.revokeObjectURL(audioInfo.value?.previewUrl)
   }
+  audioInfo.value = {
+    file: file.originFileObj,
+    previewUrl: URL.createObjectURL(file?.originFileObj)
+  }
+  nextTick(() => {
+    audioRef.value.load()
+  })
 }
 const handleSubmitFormInModal = async () => {
   try {
-    // eslint-disable-next-line no-unused-vars
-    let values = await questionFormDataRef.value.validateFields()
+    submitLoading.value = true
     let data = {
       content: questionFormData.content,
       name: questionFormData.name,
-      answers: encodeURIComponent(
-        JSON.stringify([
-          { id: 1, content: questionFormData.answer1 },
-          { id: 2, content: questionFormData.answer2 },
-          { id: 3, content: questionFormData.answer3 },
-          { id: 4, content: questionFormData.answer4 }
-        ])
-      ),
+      answers: JSON.stringify([
+        { id: 1, content: questionFormData.answer1 },
+        { id: 2, content: questionFormData.answer2 },
+        { id: 3, content: questionFormData.answer3 },
+        { id: 4, content: questionFormData.answer4 }
+      ]),
       trueAnswer: questionFormData.trueAnswer,
       type: questionFormData.type,
       partId: questionFormData.partId,
-      image: imageInfo.value?.originFileObj,
-      audio: audioInfo.value?.originFileObj
+      image: imageInfo.value?.file ? imageInfo.value?.file : null,
+      audio: audioInfo.value?.file ? audioInfo.value?.file : null
     }
-    submitLoading.value = true
     let response = await commonApi.addQuestion(data)
     if (response.status === 200 && response.data.success === true) {
       notification.success({
-        message: 'New question added'
+        message: 'You have successfully added a new question.'
       })
       questionFormDataRef.value.resetFields()
+      imageInfo.value = { file: null, previewUrl: '' }
+      audioInfo.value = { file: null, previewUrl: '' }
     } else throw new Error(response.data?.message)
   } catch (err) {
     notification.error({
@@ -208,7 +213,7 @@ getParts()
   <div>
     <h1 class="mb-8">Add Question</h1>
     <div class="mb-8">
-      <Form layout="vertical" :model="questionFormData" :rules="rules" ref="questionFormDataRef">
+      <Form layout="vertical" :model="questionFormData" :rules="rules" ref="questionFormDataRef" @finish="handleSubmitFormInModal">
         <FormItem label="Name" name="name">
           <Input
             v-model:value="questionFormData.name"
@@ -245,11 +250,16 @@ getParts()
             name="image"
             list-type="picture-card"
             :show-upload-list="false"
+            :custom-request="customPreventRequest"
             :before-upload="beforeUploadImage"
             @change="handleChangeImage"
           >
-            <div v-if="questionFormData.image" class="w-full h-full overflow-hidden">
-              <img :src="imageInfo?.url" alt="" class="rounded-md object-cover w-full h-full" />
+            <div v-if="imageInfo?.file" class="w-full h-full overflow-hidden">
+              <img
+                :src="imageInfo?.previewUrl"
+                alt=""
+                class="rounded-md object-cover w-full h-full"
+              />
             </div>
             <div v-else>
               <PlusOutlined></PlusOutlined>
@@ -262,10 +272,12 @@ getParts()
             v-model:file-list="questionFormData.audio"
             name="audio"
             :show-upload-list="false"
+            :custom-request="customPreventRequest"
             :before-upload="beforeUploadAudio"
             @change="handleChangeAudio"
+            v-if="!audioInfo?.file"
           >
-            <div v-if="!questionFormData.audio">
+            <div>
               <div
                 class="h-[128px] w-[128px] border rounded-md border-dashed flex flex-col items-center justify-center border-gray-200"
                 style="background-color: rgba(0, 0, 0, 0.02)"
@@ -275,32 +287,40 @@ getParts()
               </div>
             </div>
           </Upload>
-          <div v-if="questionFormData.audio">
-            <audio controls autoplay id="audio">
-              <source :src="audioInfo?.url" type="audio/mpeg" />
+          <div v-else>
+            <audio controls ref="audioRef">
+              <source :src="audioInfo?.previewUrl" type="audio/mpeg" />
             </audio>
           </div>
         </FormItem>
-        <div class="px-8 pt-8 pb-4 mb-6 rounded-md bg-gray-100">
-          <FormItem label="Answer 1" name="answer1">
-            <Input v-model:value="questionFormData.answer1" />
-          </FormItem>
-          <FormItem label="Answer 2" name="answer2">
-            <Input v-model:value="questionFormData.answer2" />
-          </FormItem>
-          <FormItem label="Answer 3" name="answer3">
-            <Input v-model:value="questionFormData.answer3" />
-          </FormItem>
-          <FormItem label="Answer 4" name="answer4">
-            <Input v-model:value="questionFormData.answer4" />
-          </FormItem>
-        </div>
         <FormItem label="True Answer" name="trueAnswer">
-          <Select v-model:value="questionFormData.trueAnswer" :options="chooseAnswers" />
+          <RadioGroup v-model:value="questionFormData.trueAnswer" class="w-full">
+            <div class="px-8 pt-8 pb-4 mb-6 rounded-md bg-gray-100">
+              <Radio :value="1">
+                <FormItem label="Answer 1" name="answer1">
+                  <Input v-model:value="questionFormData.answer1" />
+                </FormItem>
+              </Radio>
+              <Radio :value="2">
+                <FormItem label="Answer 2" name="answer2">
+                  <Input v-model:value="questionFormData.answer2" />
+                </FormItem>
+              </Radio>
+              <Radio :value="3">
+                <FormItem label="Answer 3" name="answer3">
+                  <Input v-model:value="questionFormData.answer3" />
+                </FormItem>
+              </Radio>
+              <Radio :value="4">
+                <FormItem label="Answer 4" name="answer4">
+                  <Input v-model:value="questionFormData.answer4" />
+                </FormItem>
+              </Radio>
+            </div>
+          </RadioGroup>
         </FormItem>
         <FormItem>
           <Button
-            @click="handleSubmitFormInModal"
             type="primary"
             html-type="submit"
             :loading="submitLoading"

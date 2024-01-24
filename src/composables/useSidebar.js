@@ -7,7 +7,8 @@ import {
   QuestionCircleOutlined,
   // AppstoreOutlined,
   LoginOutlined,
-  FileDoneOutlined
+  FileDoneOutlined,
+  LinkOutlined
 } from '@ant-design/icons-vue'
 import { useTheme } from '@/stores/theme'
 
@@ -45,6 +46,11 @@ export default function useSidebar() {
       label: h(RouterLink, { to: '/admin/test' }, { default: () => 'Test' }),
       key: '/admin/test',
       icon: h(FileDoneOutlined)
+    },
+    {
+      label: h(RouterLink, { to: '/admin/test-question' }, { default: () => 'Test - Question' }),
+      key: '/admin/test-question',
+      icon: h(LinkOutlined)
     },
     {
       label: 'Log out',
