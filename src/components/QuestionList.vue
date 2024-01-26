@@ -31,15 +31,18 @@ const handleClick = (item) => {
 <template>
   <div class="flex flex-wrap -mt-2 -mx-1">
     <div class="pt-2 px-1" v-for="item of items" :key="item.value">
-      <QuestionItem
-        :isSuccess="item.isSuccess"
-        :isFailure="item.isFailure"
-        :active="item.value === selectedItem"
-        :noneSelected="noneSelected"
-        @click="() => handleClick(item)"
-      >
-        {{ item.label }}
-      </QuestionItem>
+      <slot :item="item">
+        <QuestionItem
+          :isSuccess="item.isSuccess"
+          :isFailure="item.isFailure"
+          :isDone="item.isDone"
+          :active="item.value === selectedItem"
+          :noneSelected="noneSelected"
+          @click="() => handleClick(item)"
+        >
+          {{ item.label }}
+        </QuestionItem>
+      </slot>
     </div>
   </div>
 </template>

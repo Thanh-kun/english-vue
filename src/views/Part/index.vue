@@ -3,10 +3,13 @@ import LessonItem from '@/components/LessonItem.vue'
 import LessonBox from '@/components/LessonBox.vue'
 import { commonApi } from '@/services'
 import { useLesson, usePart, useTest } from '@/stores'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { computed } from 'vue'
+import { BadgeRibbon } from 'ant-design-vue'
+import { DocumentTextIcon } from '@heroicons/vue/24/outline'
 
 // Route
+const router = useRouter()
 const route = useRoute()
 let { partId } = route.params
 
@@ -40,9 +43,10 @@ const getLessons = async () => {
     } else throw new Error()
   } catch (err) {
     console.log(err?.message)
+    router.push('/404')
   }
 }
-const getParts = async () => {
+const getTests = async () => {
   try {
     let response = await commonApi.getTest(partId)
     if (response.status === 200 && response.data.success === true) {
@@ -50,6 +54,7 @@ const getParts = async () => {
     } else throw new Error()
   } catch (err) {
     console.log(err?.message)
+    router.push('/404')
   }
 }
 const handleClickLesson = async (lesson) => {
@@ -68,7 +73,7 @@ if (!(partId in lessonStore.lessons)) {
   getLessons()
 }
 if (!(partId in testStore.tests)) {
-  getParts()
+  getTests()
 }
 </script>
 <template>
@@ -81,7 +86,7 @@ if (!(partId in testStore.tests)) {
         <h1 class="text-2xl text-center" v-else>The TOEIC exam preparation - Listening</h1>
       </div>
       <div class="flex flex-wrap -mt-6 -mx-3">
-        <div class="w-full xl:w-3/4 pt-6 px-3">
+        <div class="w-full xl:w-2/3 pt-6 px-3">
           <div class="bg-white p-6 rounded-3xl border mb-3">
             <h2 class="text-xl font-bold mb-4">
               {{ currentPart.sub_name }}: {{ currentPart.name }}
@@ -94,57 +99,70 @@ if (!(partId in testStore.tests)) {
                 class="no-underline"
                 @click="() => handleClickLesson(lesson)"
               >
-                <LessonItem>
+                <LessonItem :isDone="lesson.is_learn">
                   {{ lesson.name }}
                 </LessonItem>
               </RouterLink>
             </LessonBox>
           </div>
           <div>
-            <div class="grid gap-1 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            <div class="grid gap-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               <RouterLink
                 v-for="test of tests"
                 :key="test.id"
                 :to="{ name: 'partTest', params: { partId: partId, testId: test.id } }"
                 class="no-underline text-black"
               >
-                <div class="bg-white px-8 rounded-3xl border transition hover:shadow-xl">
-                  <div
-                    class="text-3xl text-center font-black text-gray-400 py-6 border-b border-dashed border-gray-300"
-                  >
-                    <span
-                      v-if="test.correct !== null && test.correct !== undefined"
-                      class="text-green-300"
+                <BadgeRibbon
+                  :text="
+                    test?.correct !== undefined && test?.correct !== null
+                      ? 'Complete'
+                      : 'Not completed'
+                  "
+                  :class="{
+                    '!bg-gray-300': test?.correct === undefined || test?.correct === null,
+                    '!bg-green-500': test?.correct !== undefined && test?.correct !== null
+                  }"
+                  class="!text-sm"
+                >
+                  <div class="bg-white px-8 rounded-3xl border transition hover:shadow-xl">
+                    <div
+                      class="text-3xl text-center font-black text-gray-400 py-6 border-b border-dashed border-gray-300"
                     >
-                      <span v-if="test.failed + test.correct === 0">100%</span>
-                      <span v-else
-                        >{{
-                          Math.round((test.correct / (test.failed + test.correct)) * 100)
-                        }}%</span
+                      <span
+                        v-if="test.correct !== null && test.correct !== undefined"
+                        class="text-green-300"
                       >
-                    </span>
-                    <span v-else>0%</span>
-                  </div>
-                  <div class="pb-6 pt-4">
-                    <div
-                      class="text-xl text-gray-800 text-center font-bold mb-4 text-nowrap overflow-hidden text-ellipsis"
-                      :title="test.name"
-                    >
-                      {{ test.name }}
+                        <span v-if="test.failed + test.correct === 0">100%</span>
+                        <span v-else
+                          >{{
+                            Math.round((test.correct / (test.failed + test.correct)) * 100)
+                          }}%</span
+                        >
+                      </span>
+                      <span v-else>0%</span>
                     </div>
-                    <div
-                      class="text-center text-sm font-light text-nowrap overflow-hidden text-ellipsis"
-                      :title="`${test.participant} participant`"
-                    >
-                      {{ test.participant }} participant
+                    <div class="pb-6 pt-4">
+                      <div
+                        class="text-xl text-gray-800 text-center font-bold mb-4 text-nowrap overflow-hidden text-ellipsis"
+                        :title="test.name"
+                      >
+                        {{ test.name }}
+                      </div>
+                      <div
+                        class="text-center text-sm font-light text-nowrap overflow-hidden text-ellipsis"
+                        :title="`${test.participant} participant`"
+                      >
+                        {{ test.participant }} participant
+                      </div>
                     </div>
                   </div>
-                </div>
+                </BadgeRibbon>
               </RouterLink>
             </div>
           </div>
         </div>
-        <div class="w-full xl:w-1/4 pt-6 px-3">
+        <div class="w-full xl:w-1/3 pt-6 px-3">
           <div class="bg-white p-8 rounded-3xl border">
             <h2 class="text-xl font-bold mb-2">Other Practices</h2>
             <div class="flex flex-col">
@@ -152,9 +170,13 @@ if (!(partId in testStore.tests)) {
                 v-for="part of parts"
                 :to="'/part/' + part.id"
                 :key="part.id"
-                class="block no-underline text-black p-4 border-b border-gray-300 border-dashed line-clamp-2"
+                class="flex items-center no-underline text-black p-4 border-b border-gray-300 border-dashed line-clamp-2"
+                exact-active-class="text-primary-500"
               >
-                {{ part.sub_name }}: {{ part.name }}
+                <DocumentTextIcon class="w-4 h-4 mr-2 flex-shrink-0" />
+                <span class="whitespace-nowrap overflow-hidden text-ellipsis"
+                  >{{ part.sub_name }}: {{ part.name }}</span
+                >
               </RouterLink>
             </div>
           </div>

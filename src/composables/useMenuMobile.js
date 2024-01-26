@@ -121,7 +121,7 @@ export default function useMenu() {
           }
         ]
       }
-      
+
       if (userStore.userInfo.role === 'admin') {
         items = [
           {

@@ -24,7 +24,7 @@ const tests = ref([])
 const testsLoading = ref(false)
 
 const questionFormData = reactive({
-  content: undefined,
+  content: '',
   name: undefined,
   answer1: undefined,
   answer2: undefined,
@@ -99,6 +99,7 @@ const rules = {
   partId: [
     { required: true, message: 'Please specify the section to which the question belongs!' }
   ],
+  testId: [{ required: true, message: 'Please specify the test to which the question belongs!' }],
   answer1: [{ required: true, message: 'Please enter the first answer!' }],
   answer2: [{ required: true, message: 'Please enter the second answer!' }],
   answer3: [{ required: true, message: 'Please enter the third answer!' }],

@@ -13,7 +13,7 @@ const props = defineProps({
 </script>
 <template>
   <div
-    class="p-1 rounded-md whitespace-nowrap text-gray-800 font-semibold text-sm w-9 h-9 text-center leading-7 border cursor-pointer"
+    class="p-1 rounded-md whitespace-nowrap text-gray-800 font-semibold text-sm w-9 h-9 text-center leading-7 border"
     :class="{
       'border-primary-500 bg-primary-500 text-white ring-1 ring-primary-400 ring-offset-1': active,
       'border-green-500 bg-green-200': !active && isSuccess,

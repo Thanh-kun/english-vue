@@ -1,5 +1,5 @@
 <script setup>
-import { Footer, LessonHeader } from '@/components'
+import { LessonHeader } from '@/components'
 </script>
 <template>
   <div>
@@ -7,6 +7,5 @@ import { Footer, LessonHeader } from '@/components'
     <div style="min-height: calc(100vh - 60px)">
       <slot />
     </div>
-    <Footer />
   </div>
 </template>

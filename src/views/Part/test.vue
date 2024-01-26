@@ -20,6 +20,8 @@ const isQuestionsLoading = ref(false)
 const answers = ref([])
 const isAnswersLoading = ref(false)
 
+const isStartDisable = ref(false)
+const isSubmitLoading = ref(false)
 const testStatus = ref(STATUS.START)
 const correctQuestion = ref(0)
 const incorrectQuestion = ref(0)
@@ -31,16 +33,16 @@ const currentQuestion = computed(() => {
 })
 const questionOptions = computed(() => {
   return questions.value.map((item, index) => {
-    let answer = answers.value.find(
-      (i) =>
-        i.question_id === item.id ||
-        i.questionId === item.id
-    )
+    let answer = answers.value.find((i) => i.question_id === item.id || i.questionId === item.id)
     return {
       value: item.id,
       label: index + 1,
-      isSuccess: chooseAnswers.value[item.id]?.answerId ? chooseAnswers.value[item.id].answerId === answer.true_answer : false,
-      isFailure: chooseAnswers.value[item.id]?.answerId ? chooseAnswers.value[item.id].answerId !== answer.true_answer : false
+      isSuccess: chooseAnswers.value[item.id]?.answerId
+        ? chooseAnswers.value[item.id].answerId === answer.true_answer
+        : false,
+      isFailure: chooseAnswers.value[item.id]?.answerId
+        ? chooseAnswers.value[item.id].answerId !== answer.true_answer
+        : false
     }
   })
 })
@@ -77,24 +79,33 @@ watch(currentChooseAnswer, () => {
   }
 })
 
-const isStartButtonLoading = computed(() => {
-  return isQuestionsLoading.value && testStatus.value === STATUS.DOING
-})
-
+// Methods
 const getTestData = async () => {
   try {
     isQuestionsLoading.value = true
     let response = await commonApi.getTestById(testId)
     if (response.status === 200 && response.data.success === true) {
       questions.value = response.data?.data?.questions ?? []
+      if (questions.value?.length <= 0) {
+        isStartDisable.value = true
+        notification.info({
+          message: 'No questions are available in the quiz. Please check back later.',
+          description: 'Please come back later.'
+        })
+      }
     } else {
       throw new Error()
     }
   } catch (err) {
-    console.log(err)
+    isStartDisable.value = true
+    notification.error({
+      message: 'An error occurred, please try again!',
+      description: err.message
+    })
   } finally {
     isQuestionsLoading.value = false
   }
+  if (isStartDisable.value) return
 
   try {
     isAnswersLoading.value = true
@@ -106,20 +117,20 @@ const getTestData = async () => {
       throw new Error()
     }
   } catch (err) {
-    console.log(err)
+    notification.error({
+      message: 'An error occurred, please try again!',
+      description: err.message
+    })
   } finally {
     isAnswersLoading.value = false
   }
 }
-getTestData()
-
 const handleStarted = () => {
   currentQuestionIndex.value = 0
   currentChooseAnswer.value = undefined
 
   testStatus.value = STATUS.DOING
 }
-
 const handleReset = () => {
   currentQuestionIndex.value = 0
   currentChooseAnswer.value = undefined
@@ -130,11 +141,10 @@ const handleReset = () => {
 
   testStatus.value = STATUS.START
 }
-
 const handleNext = async () => {
   if (currentQuestionIndex.value >= questionOptions.value.length - 1) {
-    testStatus.value = STATUS.END
     try {
+      isSubmitLoading.value = true
       let data = {
         testId: Number(testId),
         correct: correctQuestion.value
@@ -143,6 +153,8 @@ const handleNext = async () => {
       if (response.data && response.data.success === true) {
         // Success
       } else throw new Error(response.data?.message)
+      isSubmitLoading.value = false
+      testStatus.value = STATUS.END
 
       try {
         let response = await commonApi.getTest(partId)
@@ -164,18 +176,15 @@ const handleNext = async () => {
     isShowAnswer.value = false
   }
 }
-
 const handleRadioChange = () => {
   if (currentAnswer.value !== undefined) {
-    console.log(currentAnswer.value.id, currentChooseAnswer.value)
     if (currentAnswer.value.id === currentChooseAnswer.value) {
       correctQuestion.value += 1
     } else incorrectQuestion.value += 1
     isShowAnswer.value = true
   }
 }
-
-if (!(partId in testStore.tests)) {
+const getParts = async () => {
   try {
     let response = await commonApi.getTest(partId)
     if (response.status === 200 && response.data.success === true) {
@@ -186,17 +195,18 @@ if (!(partId in testStore.tests)) {
   }
 }
 
-watch(questionOptions, (newValue) => {
-  console.log(newValue)
-})
+if (!(partId in testStore.tests)) {
+  getParts()
+}
+getTestData()
 </script>
 <template>
   <div style="min-height: calc(100dvh - 60px)" class="bg-primary-50 py-10">
     <div class="container mx-auto">
       <div class="flex flex-wrap -mt-3 -mx-3">
         <div class="pt-3 px-3 w-full flex-1">
-          <div class="bg-white p-8 rounded-3xl mt-11 border min-h-60">
-            <div v-if="testStatus === STATUS.START || isStartButtonLoading">
+          <div class="bg-white p-8 rounded-3xl border min-h-60">
+            <div v-if="testStatus === STATUS.START || isQuestionsLoading">
               <h2 class="text-center mb-2 font-bold">Are you ready?</h2>
               <img src="@/assets/images/start.svg" class="w-4/5 mx-auto h-full max-h-[50dvh]" />
               <div class="text-center my-8">
@@ -204,7 +214,8 @@ watch(questionOptions, (newValue) => {
                   class="min-w-40"
                   type="primary"
                   @click="handleStarted"
-                  :loading="isStartButtonLoading"
+                  :loading="isQuestionsLoading"
+                  :disabled="isStartDisable"
                   >Start</Button
                 >
               </div>
@@ -274,6 +285,11 @@ watch(questionOptions, (newValue) => {
             </div>
             <div v-if="testStatus === STATUS.END">
               <img src="@/assets/images/end.svg" class="w-4/5 mx-auto h-full max-h-[50dvh]" />
+              <div class="my-8 font-bold text-xl text-center">
+                <span class="mr-2">🎉🎉🎉</span>
+                Congratulations!
+                <span class="ml-2">🎉🎉🎉</span>
+              </div>
               <div class="my-8 flex gap-4 justify-center">
                 <div class="text-green-500 font-bold">
                   Correct: {{ correctQuestion }} / {{ questions.length }}
@@ -294,14 +310,14 @@ watch(questionOptions, (newValue) => {
             </div>
           </div>
         </div>
-        <div class="pt-3 px-3 w-full lg:w-[318px] xl:w-[362px]" v-if="testStatus == STATUS.DOING">
+        <div class="pt-3 px-3 w-full lg:w-[318px] xl:w-[362px]" v-if="testStatus !== STATUS.START">
           <QuestionBox>
             <template #header> {{ testItem.name }} </template>
             <template #body>
               <QuestionList
                 :listAnswer="chooseAnswers"
                 :items="questionOptions"
-                :selectedItem="currentQuestion.id"
+                :selectedItem="testStatus === STATUS.END ? null : currentQuestion.id"
                 noneSelected
               />
             </template>
