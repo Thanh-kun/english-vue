@@ -65,6 +65,7 @@ const currentAnswer = computed(() => {
   )
   return answerItem
 })
+const audioRef = ref(null);
 
 watch(currentChooseAnswer, () => {
   if (currentChooseAnswer.value !== undefined) {
@@ -142,6 +143,9 @@ const handleReset = () => {
   testStatus.value = STATUS.START
 }
 const handleNext = async () => {
+  if(audioRef.value) {
+    audioRef.value.load();
+  }
   if (currentQuestionIndex.value >= questionOptions.value.length - 1) {
     try {
       isSubmitLoading.value = true
@@ -177,6 +181,9 @@ const handleNext = async () => {
   }
 }
 const handleRadioChange = () => {
+  if(audioRef.value) {
+    audioRef.value.load();
+  }
   if (currentAnswer.value !== undefined) {
     if (currentAnswer.value.id === currentChooseAnswer.value) {
       correctQuestion.value += 1
@@ -225,7 +232,7 @@ getTestData()
                 Question {{ currentQuestionIndex + 1 }}: {{ currentQuestion?.name }}
               </div>
               <div class="flex justify-center mb-4" v-if="currentQuestion?.question?.audio">
-                <audio controls>
+                <audio controls ref="audioRef">
                   <source :src="currentQuestion.question?.audio" type="audio/mpeg" />
                 </audio>
               </div>

@@ -5,15 +5,13 @@ import { Button, Radio, RadioGroup, Image } from 'ant-design-vue'
 import { computed, ref, watch } from 'vue'
 import { commonApi } from '@/services/index'
 import { STATUS } from '@/constant/index'
-import { useRoute } from 'vue-router'
 
 // Route
-const route = useRoute()
-const { partId } = route.params
 
 // Reactive
 const questions = ref([])
 const questionsLoading = ref(false)
+const audioRef = ref();
 
 const testStatus = ref(STATUS.START)
 
@@ -123,6 +121,9 @@ const handleReset = async () => {
   testStatus.value = STATUS.START
 }
 const handleNext = async () => {
+  if(audioRef.value) {
+    audioRef.value.load();
+  }
   if (currentQuestionIndex.value < questions.value.length - 1) {
     ++currentQuestionIndex.value
     currentChooseAnswer.value = chooseAnswers.value[currentQuestion.value.id]?.answerId
@@ -131,12 +132,18 @@ const handleNext = async () => {
   }
 }
 const handlePrev = () => {
+  if(audioRef.value) {
+    audioRef.value.load();
+  }
   if (currentQuestionIndex.value > 0) {
     --currentQuestionIndex.value
     currentChooseAnswer.value = chooseAnswers.value[currentQuestion.value.id]?.answerId
   }
 }
 const handleClickItem = (id) => {
+  if(audioRef.value) {
+    audioRef.value.load();
+  }
   const index = questions.value.findIndex((item) => item.id === id)
   currentQuestionIndex.value = index
   currentChooseAnswer.value = chooseAnswers.value[currentQuestion.value.id]?.answerId
@@ -179,7 +186,7 @@ getTestData()
                 Question {{ currentQuestionIndex + 1 }}: {{ currentQuestion?.name }}
               </div>
               <div class="flex justify-center mb-4" v-if="currentQuestion?.question?.audio">
-                <audio controls>
+                <audio ref="audioRef" controls>
                   <source :src="currentQuestion.question?.audio" type="audio/mpeg" />
                 </audio>
               </div>
