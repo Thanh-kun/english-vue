@@ -316,7 +316,7 @@ getLessons()
             <FormItem label="Content" name="content">
               <!-- <Input v-model:value="lessonFormData.content" /> -->
               <Editor
-                api-key="uwz9im0bsj2tdn6ekifzoq0trcgaksh3y7ddgkrbrue65hyc"
+                api-key="jmjlsi835glcznkh7lsrl8u3detztdv79l0y5nk73mh57ixk"
                 :init="{
                   height: 500,
                   menubar: false,
