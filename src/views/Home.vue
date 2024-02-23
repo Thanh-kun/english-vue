@@ -154,12 +154,14 @@ const partStore = usePart()
               your skills and confidently overcome the language challenges.
             </h2>
             <div class="flex justify-center">
-              <Button type="primary">
-                <template #icon>
-                  <SparklesIcon class="inline-block w-4 h-4 mr-2" />
-                </template>
-                <span>Start now!</span>
-              </Button>
+              <RouterLink to="/listening">
+                <Button type="primary">
+                  <template #icon>
+                    <SparklesIcon class="inline-block w-4 h-4 mr-2" />
+                  </template>
+                  <span>Start now!</span>
+                </Button>
+              </RouterLink>
             </div>
           </div>
         </div>
@@ -239,10 +241,10 @@ const partStore = usePart()
                 </span>
               </div>
               <div class="px-4 pt-2">
-                <a href="#" class="flex items-center text-sm leading-4 no-underline">
+                <RouterLink to="listening" class="flex items-center text-sm leading-4 no-underline">
                   <SparklesIcon class="w-4 h-4 mr-2" />
                   <span>Start now!</span>
-                </a>
+                </RouterLink>
               </div>
             </div>
           </div>
@@ -259,10 +261,10 @@ const partStore = usePart()
                 </span>
               </div>
               <div class="px-4 pt-2">
-                <a href="#" class="flex items-center text-sm leading-4 no-underline">
+                <RouterLink to="/reading" class="flex items-center text-sm leading-4 no-underline">
                   <SparklesIcon class="w-4 h-4 mr-2" />
                   <span>Start now!</span>
-                </a>
+                </RouterLink>
               </div>
             </div>
           </div>
@@ -279,10 +281,10 @@ const partStore = usePart()
                 </span>
               </div>
               <div class="px-4 pt-2">
-                <a href="#" class="flex items-center text-sm leading-4 no-underline">
+                <RouterLink to="/mini-test" class="flex items-center text-sm leading-4 no-underline">
                   <SparklesIcon class="w-4 h-4 mr-2" />
                   <span>Start now!</span>
-                </a>
+                </RouterLink>
               </div>
             </div>
           </div>
@@ -299,10 +301,10 @@ const partStore = usePart()
                 </span>
               </div>
               <div class="px-4 pt-2">
-                <a href="#" class="flex items-center text-sm leading-4 no-underline">
+                <RouterLink to="/full-test" class="flex items-center text-sm leading-4 no-underline">
                   <SparklesIcon class="w-4 h-4 mr-2" />
                   <span>Start now!</span>
-                </a>
+                </RouterLink>
               </div>
             </div>
           </div>

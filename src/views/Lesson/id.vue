@@ -3,31 +3,34 @@ import { commonApi } from '@/services'
 import { useLesson, usePart, useTest } from '@/stores'
 import { useRoute } from 'vue-router'
 import { computed } from 'vue'
+import { DocumentTextIcon } from '@heroicons/vue/24/outline'
+import { Badge } from 'ant-design-vue'
+import { CheckCircleFilled } from '@ant-design/icons-vue'
 
+// Route
 const route = useRoute()
-let partId = route.params?.partId
-let lessonId = route.params?.lessonId
+let { partId, lessonId } = route.params
 
+// Reactive
 const lessonStore = useLesson()
 const partStore = usePart()
 const testStore = useTest()
 
-const lessons = computed(() => {
+const lessonsInPart = computed(() => {
   return lessonStore?.lessons[partId] ?? []
 })
-
-const tests = computed(() => {
+const testsInPart = computed(() => {
   return testStore?.tests[partId] ?? []
 })
-
-const lessonItem = computed(() => {
-  return lessons.value.find((item) => item.id === Number(lessonId))
+const currentLesson = computed(() => {
+  return lessonsInPart.value.find((item) => item.id === Number(lessonId))
 })
-const partItem = computed(() => {
+const currentPart = computed(() => {
   return partStore.parts.find((item) => item.id === Number(partId))
 })
 
-if (!(partId in lessonStore.lessons)) {
+// Methods
+const getLessons = async () => {
   try {
     let response = await commonApi.getLesson(partId)
     if (response.status === 200 && response.data.success === true) {
@@ -37,8 +40,7 @@ if (!(partId in lessonStore.lessons)) {
     console.log(err?.message)
   }
 }
-
-if (!(testStore.lessons && partId in testStore.lessons)) {
+const getTests = async () => {
   try {
     let response = await commonApi.getTest(partId)
     if (response.status === 200 && response.data.success === true) {
@@ -48,57 +50,86 @@ if (!(testStore.lessons && partId in testStore.lessons)) {
     console.log(err?.message)
   }
 }
+const handleClickLesson = async (lesson) => {
+  try {
+    let response = await commonApi.readLesson(lesson.id)
+    if (response.status === 200 && response.data.success === true) {
+      getLessons()
+    } else throw new Error()
+  } catch (err) {
+    console.error(err.message)
+  }
+}
+
+// Run code
+if (!(partId in lessonStore.lessons)) getLessons()
+if (!(testStore.lessons && partId in testStore.lessons)) getTests()
 </script>
 <template>
   <div style="min-height: calc(100dvh - 60px)" class="bg-primary-50 py-10">
     <div class="w-full container mx-auto">
       <div class="flex flex-wrap -mt-20 -mx-3">
-        <div class="w-full xl:w-3/4 pt-20 px-3">
+        <div class="w-full xl:w-2/3 pt-20 px-3">
           <div class="bg-white p-8 rounded-3xl border mb-2 xl:hidden">
-            <h1 class="text-2xl font-bold">{{ partItem?.sub_name }}: {{ partItem?.name }}</h1>
+            <h1 class="text-2xl font-bold">{{ currentPart?.sub_name }}: {{ currentPart?.name }}</h1>
           </div>
           <div class="bg-white p-8 rounded-3xl border scroll-custom overflow-auto">
-            <h2 class="text-base font-bold mb-4">{{ lessonItem?.name }}</h2>
+            <h2 class="text-lg font-bold mb-4">{{ currentLesson?.name }}</h2>
             <div class="font-sans">
-              <div v-html="lessonItem?.content"></div>
+              <div v-html="currentLesson?.content"></div>
             </div>
           </div>
         </div>
-        <div class="w-full xl:w-1/4 pt-20 px-3">
+        <div class="w-full xl:w-1/3 pt-20 px-3">
           <div class="bg-white p-8 rounded-3xl border mb-2 xl:block hidden">
-            <h1 class="text-2xl font-bold">{{ partItem?.sub_name }}: {{ partItem?.name }}</h1>
+            <h1 class="text-2xl font-bold">{{ currentPart?.sub_name }}: {{ currentPart?.name }}</h1>
           </div>
           <div class="bg-white p-8 rounded-3xl border mb-2">
             <h2 class="text-xl font-bold mb-2">Lessons</h2>
             <div>
               <RouterLink
-                v-for="lesson of lessons"
+                v-for="lesson of lessonsInPart"
                 :to="{ name: 'lesson', params: { partId, lessonId: lesson.id } }"
                 :key="lesson.id"
                 :title="lesson.name"
-                class="block no-underline text-black p-4 border-b border-gray-300 border-dashed line-clamp-2"
+                class="flex items-center no-underline text-black py-4 px-2 border-b border-gray-300 border-dashed line-clamp-2"
+                @click="() => handleClickLesson(lesson)"
+                exact-active-class="text-primary-500"
               >
-                {{ lesson.name }}
+                <DocumentTextIcon class="w-4 h-4 flex-shrink-0 mr-2" />
+                <span class="whitespace-nowrap overflow-hidden text-ellipsis">{{
+                  lesson.name
+                }}</span>
               </RouterLink>
             </div>
           </div>
           <div class="bg-white p-8 rounded-3xl border">
             <h2 class="text-xl font-bold mb-4">Practices</h2>
             <div class="flex flex-wrap -mt-2 -mx-1">
-              <div class="px-1 pt-2">
-                <RouterLink
-                  v-for="test of tests"
-                  :key="test.id"
-                  :to="{ name: 'partTest', params: { partId: partId, testId: test.id } }"
-                  class="no-underline"
-                >
-                  <div
-                    class="px-3 py-2 font-bold text-sm border rounded-xl text-center"
-                    :title="test.name"
+              <div class="px-1 pt-2" v-for="test of testsInPart" :key="test.id">
+                <Badge>
+                  <template #count>
+                    <CheckCircleFilled
+                      class="text-green-500"
+                      v-if="test?.correct !== undefined && test?.correct !== null"
+                    />
+                    <CheckCircleFilled
+                      class="text-gray-300"
+                      v-if="test?.correct === undefined || test?.correct === null"
+                    />
+                  </template>
+                  <RouterLink
+                    :to="{ name: 'partTest', params: { partId: partId, testId: test.id } }"
+                    class="no-underline text-black"
                   >
-                    {{ test.name }}
-                  </div>
-                </RouterLink>
+                    <div
+                      class="px-3 py-2 font-bold text-sm border rounded-xl text-center text-black"
+                      :title="test.name"
+                    >
+                      {{ test.name }}
+                    </div>
+                  </RouterLink>
+                </Badge>
               </div>
             </div>
           </div>

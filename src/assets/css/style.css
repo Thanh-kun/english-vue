@@ -21,6 +21,12 @@
   transform: rotate(33deg);
 }
 
+.ant-btn-primary {
+  color: #fff;
+  background-color: #3b82f6;
+  box-shadow: 0 2px 0 rgba(5, 138, 255, 0.06);
+}
+
 @keyframes rotate-45 {
   from {
     transform: rotate(0, 0deg);

@@ -187,6 +187,11 @@ const router = createRouter({
         layout: 'DashboardLayout',
         isAdmin: true
       }
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: () => import('@/views/NotFound.vue')
     }
   ]
 })

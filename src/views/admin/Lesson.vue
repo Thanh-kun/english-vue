@@ -1,42 +1,37 @@
 <script setup>
 import { commonApi } from '@/services'
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons-vue'
 import { Table, notification, Select, Button, Form, FormItem, Input, Modal } from 'ant-design-vue'
 import { computed, reactive, ref } from 'vue'
 import Editor from '@tinymce/tinymce-vue'
 
 const parts = ref([])
+const partsLoading = ref(false)
+
 const lessons = ref([])
+const lessonsLoading = ref(false)
+
 const pageSize = ref(10)
 const current = ref(1)
 const total = ref(0)
-const partsLoading = ref(false)
-const lessonsLoading = ref(false)
 
 const searchFormData = reactive({
   partId: undefined
 })
 
+const visibleModal = ref(false)
 const isEdit = ref(false)
 const lessonFormData = ref({
   name: '',
   content: '',
   partId: ''
 })
-const confirmLoading = ref(false)
-const visibleModal = ref(false)
 const lessonFormDataRef = ref()
-
-const rules = {
-  name: [{ required: true, message: 'Please input name!' }],
-  content: [{ required: true, message: 'Please input content!' }],
-  partId: [{ required: true, message: 'Please input part!' }]
-}
+const confirmLoading = ref(false)
 
 const partOptions = computed(() => {
   return parts.value.map((item) => ({ value: item.id, label: item.sub_name + ': ' + item.name }))
 })
-
 const pagination = computed(() => {
   return {
     pageSize: pageSize.value,
@@ -46,6 +41,14 @@ const pagination = computed(() => {
   }
 })
 
+// Validate Form
+const rules = {
+  name: [{ required: true, message: 'Please enter the lesson name!' }],
+  content: [{ required: true, message: 'Please enter the lesson content!' }],
+  partId: [{ required: true, message: 'Please select the part to which the lesson belongs!' }]
+}
+
+// Variable
 const columns = [
   {
     title: 'Name',
@@ -55,10 +58,11 @@ const columns = [
   {
     title: 'Content',
     dataIndex: 'content',
-    key: 'content'
+    key: 'content',
+    width: '40%'
   },
   {
-    title: 'Part_id',
+    title: 'Part',
     dataIndex: 'part_id',
     key: 'part_id'
   },
@@ -74,13 +78,13 @@ const columns = [
   }
 ]
 
+// Methods
 const getParts = async () => {
   try {
     partsLoading.value = true
     let response = await commonApi.getPart()
     if (response.data && response.data.success === true && response.data.data) {
       parts.value = response.data?.data ?? []
-      searchFormData.partId = parts.value.length > 0 ? parts.value[0].id : undefined
     } else throw new Error(response.data?.message)
   } catch (err) {
     notification.error({
@@ -91,8 +95,6 @@ const getParts = async () => {
     partsLoading.value = false
   }
 }
-await getParts()
-
 const getLessons = async () => {
   try {
     lessonsLoading.value = true
@@ -110,17 +112,13 @@ const getLessons = async () => {
     lessonsLoading.value = false
   }
 }
-getLessons()
-
 const handleChange = async (page) => {
   pageSize.value = page.pageSize
   current.value = page.current
 }
-
 const partIdToText = (partId) => {
   return partOptions.value.find((item) => item.value === partId)?.label
 }
-
 const showAddModal = () => {
   lessonFormData.value = {
     id: '',
@@ -131,7 +129,6 @@ const showAddModal = () => {
   isEdit.value = false
   visibleModal.value = true
 }
-
 const showEditModal = (item) => {
   lessonFormData.value = {
     id: item.id,
@@ -142,36 +139,38 @@ const showEditModal = (item) => {
   isEdit.value = true
   visibleModal.value = true
 }
-
 const handleSubmitFormInModal = async () => {
   try {
-    // eslint-disable-next-line no-unused-vars
-    let values = await lessonFormDataRef.value.validateFields()
-    console.log(lessonFormData.value)
+    await lessonFormDataRef.value.validateFields()
+  } catch (err) {
+    return
+  }
+
+  try {
+    confirmLoading.value = true
     let data = {
       id: lessonFormData.value.id,
       name: lessonFormData.value.name,
       content: lessonFormData.value.content,
       partId: lessonFormData.value.partId
     }
-    let response
-    confirmLoading.value = true
+
     if (!isEdit.value) {
-      response = await commonApi.addLesson(data)
+      let response = await commonApi.addLesson(data)
       if (response.data && response.data.success === true) {
         notification.success({
-          message: 'New lesson added'
+          message: 'New lesson added successfully'
         })
-        await getLessons()
+        getLessons()
         visibleModal.value = false
       } else throw new Error(response.data?.message)
     } else if (isEdit.value) {
-      response = await commonApi.editLesson(data)
+      let response = await commonApi.editLesson(data)
       if (response.data && response.data.success === true) {
         notification.success({
-          message: 'Updated lesson'
+          message: 'Lesson updated successfully'
         })
-        await getLessons()
+        getLessons()
         visibleModal.value = false
       } else throw new Error(response.data?.message)
     }
@@ -184,7 +183,6 @@ const handleSubmitFormInModal = async () => {
     confirmLoading.value = false
   }
 }
-
 const handleDelete = (item) => {
   Modal.confirm({
     title: 'Do you want to delete the lesson?',
@@ -196,7 +194,7 @@ const handleDelete = (item) => {
         let response = await commonApi.deleteLesson(data)
         if (response.data && response.data.success === true) {
           notification.success({
-            message: 'Lesson has been deleted'
+            message: 'Lesson deleted successfully'
           })
           await getLessons()
         } else throw new Error(response.data?.message)
@@ -209,20 +207,48 @@ const handleDelete = (item) => {
     }
   })
 }
+
+// Run code
+await getParts()
+searchFormData.partId = parts.value.length > 0 ? parts.value[0].id : undefined
+getLessons()
 </script>
 <template>
   <div>
     <h1 class="mb-8">Lessons</h1>
-    <div class="flex gap-4 lg:flex-row flex-col mb-8">
-      <Select
-        :options="partOptions"
-        v-model:value="searchFormData.partId"
-        class="w-full"
-        placeholder="Enter the part"
-        :loading="partsLoading"
-      >
-      </Select>
-      <Button type="primary" :loading="lessonsLoading" @click="getLessons">Search</Button>
+    <div class="flex gap-4 lg:flex-row flex-col mb-2">
+      <Form :model="searchFormData" layout="vertical" @finish="getLessons" class="w-full">
+        <div class="flex md:flex-row flex-col gap-x-4">
+          <div class="flex-1">
+            <FormItem label="Part:" name="partId">
+              <Select
+                :options="partOptions"
+                v-model:value="searchFormData.partId"
+                class="w-full"
+                placeholder="Enter the part"
+                :loading="partsLoading"
+              >
+              </Select>
+            </FormItem>
+          </div>
+          <div class="md:self-end">
+            <FormItem>
+              <Button
+                type="primary"
+                :loading="lessonsLoading"
+                html-type="submit"
+                class="!flex items-center justify-center w-full"
+                :disabled="partsLoading"
+              >
+                <template #icon>
+                  <SearchOutlined />
+                </template>
+                Search
+              </Button>
+            </FormItem>
+          </div>
+        </div>
+      </Form>
     </div>
     <div class="mb-8">
       <Button class="!inline-flex items-center" type="primary" @click="showAddModal">

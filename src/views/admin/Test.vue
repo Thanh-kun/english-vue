@@ -4,40 +4,29 @@ import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant
 import { Table, notification, Select, Button, Modal, FormItem, Form, Input } from 'ant-design-vue'
 import { computed, reactive, ref } from 'vue'
 
+// Reactive
 const parts = ref([])
+const partsLoading = ref(false)
+
 const tests = ref([])
+const testsLoading = ref(false)
+
 const pageSize = ref(10)
 const current = ref(1)
 const total = ref(0)
-const partsLoading = ref(false)
-const testsLoading = ref(false)
 
 const searchFormData = reactive({
   partId: ''
 })
 
+const visibleModal = ref(false)
 const isEdit = ref(false)
 const testFormData = ref({
   name: '',
   partId: ''
 })
-const confirmLoading = ref(false)
-const visibleModal = ref(false)
 const testFormDataRef = ref()
-
-const rules = {
-  name: [{ required: true, message: 'Please input name!' }],
-  partId: [{ required: true, message: 'Please input part!' }]
-}
-
-const partItems = computed(() => {
-  return parts.value.map((item) => ({ value: item.id, label: item.sub_name + ' :' + item.name }))
-})
-
-const partOptions = computed(() => {
-  let options = [{ value: '', label: 'All Parts' }]
-  return [...options, ...partItems.value]
-})
+const confirmLoading = ref(false)
 
 const pagination = computed(() => {
   return {
@@ -47,7 +36,19 @@ const pagination = computed(() => {
     showSizeChanger: true
   }
 })
+const partItems = computed(() => {
+  return parts.value.map((item) => ({ value: item.id, label: item.sub_name + ' :' + item.name }))
+})
+const partOptions = computed(() => {
+  let options = [{ value: '', label: 'All Parts' }]
+  return [...options, ...partItems.value]
+})
 
+// Variable
+const rules = {
+  name: [{ required: true, message: 'Please enter the test name!' }],
+  partId: [{ required: true, message: 'Please select the part to which the test belongs!' }]
+}
 const columns = [
   {
     title: 'Id',
@@ -65,7 +66,7 @@ const columns = [
     key: 'participant'
   },
   {
-    title: 'Part Id',
+    title: 'Part',
     dataIndex: 'part_id',
     key: 'part_id'
   },
@@ -76,6 +77,7 @@ const columns = [
   }
 ]
 
+// Methods
 const getParts = async () => {
   try {
     partsLoading.value = true
@@ -92,7 +94,6 @@ const getParts = async () => {
     partsLoading.value = false
   }
 }
-
 const getTests = async () => {
   try {
     testsLoading.value = true
@@ -115,7 +116,6 @@ const getTests = async () => {
     testsLoading.value = false
   }
 }
-
 const handleChange = async (page) => {
   pageSize.value = page.pageSize
   current.value = page.current
@@ -124,7 +124,6 @@ const handleChange = async (page) => {
 const partIdToText = (partId) => {
   return partOptions.value.find((item) => item.value === partId)?.label
 }
-
 const showAddModal = () => {
   testFormData.value = {
     id: '',
@@ -134,7 +133,6 @@ const showAddModal = () => {
   isEdit.value = false
   visibleModal.value = true
 }
-
 const showEditModal = (item) => {
   testFormData.value = {
     id: item.id,
@@ -144,35 +142,36 @@ const showEditModal = (item) => {
   isEdit.value = true
   visibleModal.value = true
 }
-
 const handleSubmitFormInModal = async () => {
   try {
-    // eslint-disable-next-line no-unused-vars
-    let values = await testFormDataRef.value.validateFields()
-    console.log(testFormData.value)
+    await testFormDataRef.value.validateFields()
+  } catch (err) {
+    return
+  }
+
+  try {
+    confirmLoading.value = true
     let data = {
       id: testFormData.value.id,
       name: testFormData.value.name,
       partId: testFormData.value.partId
     }
-    let response
-    confirmLoading.value = true
     if (!isEdit.value) {
-      response = await commonApi.addTest(data)
+      let response = await commonApi.addTest(data)
       if (response.data && response.data.success === true) {
         notification.success({
-          message: 'New test added'
+          message: 'New test added successfully.'
         })
-        await getTests()
+        getTests()
         visibleModal.value = false
       } else throw new Error(response.data?.message)
     } else if (isEdit.value) {
-      response = await commonApi.editTest(data)
+      let response = await commonApi.editTest(data)
       if (response.data && response.data.success === true) {
         notification.success({
-          message: 'Updated test'
+          message: 'Test updated successfully.'
         })
-        await getTests()
+        getTests()
         visibleModal.value = false
       } else throw new Error(response.data?.message)
     }
@@ -185,7 +184,6 @@ const handleSubmitFormInModal = async () => {
     confirmLoading.value = false
   }
 }
-
 const handleDelete = (item) => {
   Modal.confirm({
     title: 'Do you want to delete the test?',
@@ -199,7 +197,7 @@ const handleDelete = (item) => {
           notification.success({
             message: 'Test has been deleted'
           })
-          await getTests()
+          getTests()
         } else throw new Error(response.data?.message)
       } catch (err) {
         notification.error({
@@ -217,27 +215,38 @@ getTests()
 <template>
   <div>
     <h1 class="mb-8">Tests</h1>
-    <div class="flex gap-4 lg:flex-row flex-col mb-8">
-      <Select
-        :options="partOptions"
-        v-model:value="searchFormData.partId"
-        class="w-full"
-        placeholder="Enter the part"
-        :loading="partsLoading"
-      >
-      </Select>
-      <Button
-        type="primary"
-        :loading="testsLoading"
-        @click="getTests"
-        htmlType="submit"
-        class="!flex items-center"
-      >
-        <template #icon>
-          <SearchOutlined />
-        </template>
-        Search
-      </Button>
+    <div class="flex gap-4 lg:flex-row flex-col mb-2">
+      <Form :model="searchFormData" layout="vertical" @finish="getTests" class="w-full">
+        <div class="flex md:flex-row flex-col gap-x-4">
+          <div class="flex-1">
+            <FormItem name="partId" label="Part:">
+              <Select
+                :options="partOptions"
+                v-model:value="searchFormData.partId"
+                class="w-full"
+                placeholder="Enter the part"
+                :loading="partsLoading"
+              />
+            </FormItem>
+          </div>
+          <div class="md:self-end">
+            <FormItem>
+              <Button
+                type="primary"
+                :loading="testsLoading"
+                htmlType="submit"
+                class="!flex items-center justify-center w-full"
+                :disabled="partsLoading"
+              >
+                <template #icon>
+                  <SearchOutlined />
+                </template>
+                Search
+              </Button>
+            </FormItem>
+          </div>
+        </div>
+      </Form>
     </div>
     <div class="mb-8">
       <Button class="!inline-flex items-center" type="primary" @click="showAddModal">

@@ -4,12 +4,15 @@ import { EditOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { Button, Form, FormItem, Modal, Table, notification, Input, Select } from 'ant-design-vue'
 import { computed, ref } from 'vue'
 
+// Reactive
 const parts = ref([])
+const partsLoading = ref(false)
+
 const pageSize = ref(10)
 const current = ref(1)
 const total = ref(0)
-const loading = ref(false)
 
+const visibleModal = ref(false)
 const isEdit = ref(false)
 const partFormData = ref({
   subname: '',
@@ -18,17 +21,8 @@ const partFormData = ref({
   thumbnail: '',
   type: ''
 })
+const partFormDataRef = ref(null)
 const confirmLoading = ref(false)
-const visibleModal = ref(false)
-const partFormDataRef = ref()
-
-const rules = {
-  subname: [{ required: true, message: 'Please input subname!' }],
-  name: [{ required: true, message: 'Please input name!' }],
-  type: [{ required: true, message: 'Please input type!' }],
-  description: [{ required: true, message: 'Please input description!' }],
-  thumbnail: [{ required: true, message: 'Please input thumbnail!' }]
-}
 
 const pagination = computed(() => {
   return {
@@ -38,7 +32,16 @@ const pagination = computed(() => {
     showSizeChanger: true
   }
 })
+// Validate Form
+const rules = {
+  subname: [{ required: true, message: 'Please enter the subname of the part!' }],
+  name: [{ required: true, message: 'Please enter the name of the part!' }],
+  type: [{ required: true, message: 'Please choose the type of the part!' }],
+  description: [{ required: true, message: 'Please enter the description of the part!' }],
+  thumbnail: [{ required: true, message: 'Please enter the thumbnail of the part!' }]
+}
 
+// Variable
 const columns = [
   {
     title: 'Name',
@@ -48,7 +51,8 @@ const columns = [
   {
     title: 'Description',
     dataIndex: 'description',
-    key: 'description'
+    key: 'description',
+    width: '40%'
   },
   {
     title: 'Thumbnail',
@@ -56,7 +60,7 @@ const columns = [
     key: 'thumbnail'
   },
   {
-    title: 'Sub_name',
+    title: 'Sub name',
     dataIndex: 'sub_name',
     key: 'sub_name'
   },
@@ -72,7 +76,6 @@ const columns = [
     width: '88px'
   }
 ]
-
 const partTypes = [
   {
     value: 1,
@@ -84,9 +87,10 @@ const partTypes = [
   }
 ]
 
+// Methods
 const getParts = async () => {
   try {
-    loading.value = true
+    partsLoading.value = true
     let response = await commonApi.getPart()
     if (response.data && response.data.success === true && response.data.data) {
       parts.value = response.data?.data ?? []
@@ -98,16 +102,13 @@ const getParts = async () => {
       description: err.message
     })
   } finally {
-    loading.value = false
+    partsLoading.value = false
   }
 }
-getParts()
-
 const handleChange = async (page) => {
   pageSize.value = page.pageSize
   current.value = page.current
 }
-
 const showAddModal = () => {
   partFormData.value = {
     id: '',
@@ -120,7 +121,6 @@ const showAddModal = () => {
   isEdit.value = false
   visibleModal.value = true
 }
-
 const showEditModal = (item) => {
   partFormData.value = {
     id: item.id,
@@ -133,11 +133,15 @@ const showEditModal = (item) => {
   isEdit.value = true
   visibleModal.value = true
 }
-
 const handleSubmitFormInModal = async () => {
   try {
-    // eslint-disable-next-line no-unused-vars
-    let values = await partFormDataRef.value.validateFields()
+    await partFormDataRef.value.validateFields()
+  } catch (err) {
+    return
+  }
+
+  try {
+    confirmLoading.value = true
     let data = {
       id: partFormData.value.id,
       subname: partFormData.value.subname,
@@ -146,24 +150,23 @@ const handleSubmitFormInModal = async () => {
       thumbnail: partFormData.value.thumbnail,
       type: partFormData.value.type
     }
-    let response
-    confirmLoading.value = true
+
     if (!isEdit.value) {
-      response = await commonApi.addPart(data)
+      let response = await commonApi.addPart(data)
       if (response.data && response.data.success === true) {
         notification.success({
-          message: 'New part added'
+          message: 'New part added successfully.'
         })
-        await getParts()
+        getParts()
         visibleModal.value = false
       } else throw new Error(response.data?.message)
     } else if (isEdit.value) {
-      response = await commonApi.editPart(data)
+      let response = await commonApi.editPart(data)
       if (response.data && response.data.success === true) {
         notification.success({
-          message: 'Updated part'
+          message: 'Part updated successfully.'
         })
-        await getParts()
+        getParts()
         visibleModal.value = false
       } else throw new Error(response.data?.message)
     }
@@ -176,6 +179,9 @@ const handleSubmitFormInModal = async () => {
     confirmLoading.value = false
   }
 }
+
+// Run code
+getParts()
 </script>
 <template>
   <div>
@@ -194,7 +200,7 @@ const handleSubmitFormInModal = async () => {
         :columns="columns"
         :pagination="pagination"
         @change="handleChange"
-        :loading="loading"
+        :loading="partsLoading"
         bordered
       >
         <template #bodyCell="{ text, column, record }">

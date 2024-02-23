@@ -13,9 +13,9 @@ import {
       <div class="container mx-auto flex py-12 flex-wrap">
         <div class="w-full lg:w-1/3">
           <div class="h-20 lg:w-fit mb-10">
-            <a href="#">
+            <RouterLink to="/" >
               <LogoFrame />
-            </a>
+            </RouterLink>
           </div>
         </div>
         <div class="w-full lg:w-2/3">
@@ -53,36 +53,36 @@ import {
               <h4 class="text-white mb-3">Feature</h4>
               <ul>
                 <li class="text-sm mb-1">
-                  <a
-                    href="#"
+                  <RouterLink
+                    to="listening"
                     class="text-white no-underline hover:text-gray-200 transition-colors duration-300"
                   >
                     Listening
-                  </a>
+                  </RouterLink>
                 </li>
                 <li class="text-sm mb-1">
-                  <a
-                    href="#"
+                  <RouterLink
+                    to="/reading"
                     class="text-white no-underline hover:text-gray-200 transition-colors duration-300"
                   >
                     Reading
-                  </a>
+                  </RouterLink>
                 </li>
                 <li class="text-sm mb-1">
-                  <a
-                    href="#"
+                  <RouterLink
+                    to="/mini-test"
                     class="text-white no-underline hover:text-gray-200 transition-colors duration-300"
                   >
                     Mini test
-                  </a>
+                  </RouterLink>
                 </li>
                 <li class="text-sm mb-1">
-                  <a
-                    href="#"
+                  <RouterLink
+                    to="/full-test"
                     class="text-white no-underline hover:text-gray-200 transition-colors duration-300"
                   >
                     Full test
-                  </a>
+                  </RouterLink>
                 </li>
               </ul>
             </div>
